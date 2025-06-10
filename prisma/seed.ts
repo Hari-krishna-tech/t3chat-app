@@ -22,6 +22,16 @@ async function main() {
           'https://images.ctfassets.net/e5382hct74si/4BtM41PDNrx4z1ml643tdc/7aa88bdde8b5b7809174ea5b764c80fa/adWRdqQ6_400x400.jpg',
       },
     }),
+    prisma.users.upsert({
+      where: { email: 'harikrishna@vercel.com' },
+      update: {},
+      create: {
+        name: 'Harikrishna',
+        email: 'harikrishna@vercel.com',
+        image:
+          'https://images.ctfassets.net/e5382hct74si/4BtM41PDNrx4z1ml643tdc/7aa88bdde8b5b7809174ea5b764c80fa/adWRdqQ6_400x400.jpg',
+      },
+    }),
     await prisma.users.upsert({
       where: { email: 'stey@vercel.com' },
       update: {},

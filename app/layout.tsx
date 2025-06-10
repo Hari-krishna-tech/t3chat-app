@@ -2,10 +2,10 @@ import './globals.css'
 import { Inter } from 'next/font/google'
 
 export const metadata = {
-  metadataBase: new URL('https://postgres-prisma.vercel.app'),
-  title: 'Vercel Postgres Demo with Prisma',
+  metadataBase: new URL('https://t3chat-app.vercel.app/'),
+  title: 'T3 Chat',
   description:
-    'A simple Next.js app with Vercel Postgres as the database and Prisma as the ORM',
+    'T3 Chat is a simple chat application built with Next.js, Shadcn, Tailwind, and Vercel Postgres',
 }
 
 const inter = Inter({
