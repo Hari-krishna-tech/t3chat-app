@@ -1,5 +1,8 @@
 import './globals.css'
 import { Inter } from 'next/font/google'
+import { getServerSession } from "next-auth/next";
+import { SessionProvider } from "next-auth/react";
+import { authOptions } from "./api/auth/[...nextauth]/route";
 
 export const metadata = {
   metadataBase: new URL('https://t3chat-app.vercel.app/'),
@@ -14,14 +17,20 @@ const inter = Inter({
   display: 'swap',
 })
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const session = await getServerSession(authOptions);
+
   return (
     <html lang="en">
-      <body className={inter.variable}>{children}</body>
+      <body className={inter.variable}>
+        <SessionProvider session={session}>
+          {children}
+        </SessionProvider>
+      </body>
     </html>
   )
 }

@@ -1,6 +1,10 @@
-import React from 'react';
+"use client";
+
+import { useSession } from "next-auth/react";
 
 export default function ChatSidebar() {
+  const { data: session } = useSession();
+
   return (
     <aside className="flex flex-col h-full w-72 bg-zinc-900 text-white border-r border-zinc-800">
       {/* Header */}
@@ -28,10 +32,20 @@ export default function ChatSidebar() {
       </div>
       {/* User Profile */}
       <div className="p-4 border-t border-zinc-800 flex items-center gap-3">
-        <div className="w-8 h-8 rounded-full bg-zinc-700 flex items-center justify-center text-sm font-bold">H</div>
+        {session?.user?.image ? (
+          <img
+            src={session.user.image}
+            alt={session.user.name || "User"}
+            className="w-8 h-8 rounded-full"
+          />
+        ) : (
+          <div className="w-8 h-8 rounded-full bg-zinc-700 flex items-center justify-center text-sm font-bold">
+            {session?.user?.name?.[0] || "U"}
+          </div>
+        )}
         <div>
-          <div className="text-sm font-semibold">HARI KRISHNA</div>
-          <div className="text-xs text-zinc-400">Pro</div>
+          <div className="text-sm font-semibold">{session?.user?.name || "User"}</div>
+          <div className="text-xs text-zinc-400">{session?.user?.email || ""}</div>
         </div>
       </div>
     </aside>
