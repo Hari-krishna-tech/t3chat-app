@@ -1,8 +1,8 @@
 import './globals.css'
 import { Inter } from 'next/font/google'
 import { getServerSession } from "next-auth/next";
-import { SessionProvider } from "next-auth/react";
 import { authOptions } from "./api/auth/[...nextauth]/route";
+import Providers from "@/components/Providers";
 
 export const metadata = {
   metadataBase: new URL('https://t3chat-app.vercel.app/'),
@@ -27,9 +27,9 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className={inter.variable}>
-        <SessionProvider session={session}>
+        <Providers session={session}>
           {children}
-        </SessionProvider>
+        </Providers>
       </body>
     </html>
   )
