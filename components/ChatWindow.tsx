@@ -24,9 +24,20 @@ export default function ChatWindow() {
     let botMsg: Message = { id: Date.now() + '-bot', text: '', sender: 'bot' };
     setMessages((msgs) => [...msgs, botMsg]);
     try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message, model }),
+      });
+
+      if (!res.body) throw new Error("No response body");
+
+      const reader = res.body.getReader();
       let text = '';
-      for await (const chunk of streamModelResponse(model, message)) {
-        text += chunk;
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        text += new TextDecoder().decode(value);
         setMessages((msgs) =>
           msgs.map((m) =>
             m.id === botMsg.id ? { ...m, text } : m
