@@ -10,7 +10,7 @@ export async function* streamModelResponse(model: ModelType, prompt: string) {
       yield* streamGeminiResponse(prompt);
       break;
     case "gemini-2.0-flash":
-      yield* streamGeminiResponse(prompt);
+      yield* streamGemini20FlashResponse(prompt);
       break;
     case "gpt-4":
     case "gpt-3.5-turbo":
@@ -21,6 +21,23 @@ export async function* streamModelResponse(model: ModelType, prompt: string) {
       throw new Error("Claude streaming not implemented yet");
     default:
       throw new Error(`Model ${model} not supported`);
+  }
+}
+
+async function* streamGemini20FlashResponse(prompt: string) {
+  try {
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    const result = await model.generateContentStream(prompt);
+
+    for await (const chunk of result.stream) {
+      const text = chunk.text();
+      if (text) {
+        yield text;
+      }
+    }
+  } catch (error) {
+    console.error("Error in Gemini streaming:", error);
+    throw error;
   }
 }
 
