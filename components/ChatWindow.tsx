@@ -47,7 +47,7 @@ export default function ChatWindow() {
     } catch (err) {
       setMessages((msgs) =>
         msgs.map((m) =>
-          m.id === botMsg.id ? { ...m, text: 'Error getting response.' } : m
+          m.id === botMsg.id ? { ...m, text: 'Error getting response. ' + (err as Error).message } : m
         )
       );
     } finally {
