@@ -9,6 +9,9 @@ export async function* streamModelResponse(model: ModelType, prompt: string) {
     case "gemini-pro":
       yield* streamGeminiResponse(prompt);
       break;
+    case "gemini-2.0-flash":
+      yield* streamGeminiResponse(prompt);
+      break;
     case "gpt-4":
     case "gpt-3.5-turbo":
       // TODO: Implement OpenAI streaming
