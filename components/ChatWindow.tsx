@@ -1,6 +1,48 @@
-import React from 'react';
+import React, { useState } from 'react';
+import ChatInput from './ChatInput';
+import { ModelType } from '@/lib/models';
+import { streamModelResponse } from '@/lib/modelService';
+
+interface Message {
+  id: string;
+  text: string;
+  sender: 'user' | 'bot';
+}
 
 export default function ChatWindow() {
+  const [messages, setMessages] = useState<Message[]>([
+    { id: '1', text: 'Hello! How can I help you today?', sender: 'bot' },
+    { id: '2', text: 'I want to build a chat app UI like this.', sender: 'user' },
+  ]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const onSendMessage = async (message: string, model: ModelType) => {
+    const userMsg: Message = { id: Date.now() + '-user', text: message, sender: 'user' };
+    setMessages((msgs) => [...msgs, userMsg]);
+    setIsLoading(true);
+    let botMsg: Message = { id: Date.now() + '-bot', text: '', sender: 'bot' };
+    setMessages((msgs) => [...msgs, botMsg]);
+    try {
+      let text = '';
+      for await (const chunk of streamModelResponse(model, message)) {
+        text += chunk;
+        setMessages((msgs) =>
+          msgs.map((m) =>
+            m.id === botMsg.id ? { ...m, text } : m
+          )
+        );
+      }
+    } catch (err) {
+      setMessages((msgs) =>
+        msgs.map((m) =>
+          m.id === botMsg.id ? { ...m, text: 'Error getting response.' } : m
+        )
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <section className="flex flex-col flex-1 h-full">
       {/* Header */}
@@ -10,25 +52,20 @@ export default function ChatWindow() {
       </header>
       {/* Chat messages */}
       <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4 bg-zinc-50">
-        {/* Example messages */}
-        <div className="flex gap-3 items-start">
-          <div className="w-8 h-8 rounded-full bg-zinc-700 flex items-center justify-center text-white font-bold">H</div>
-          <div className="bg-white rounded-lg px-4 py-2 shadow text-sm max-w-xl">Hello! How can I help you today?</div>
-        </div>
-        <div className="flex gap-3 items-start flex-row-reverse">
-          <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">Y</div>
-          <div className="bg-blue-100 rounded-lg px-4 py-2 shadow text-sm max-w-xl">I want to build a chat app UI like this.</div>
-        </div>
+        {messages.map((msg) => (
+          <div
+            key={msg.id}
+            className={`flex gap-3 items-start ${msg.sender === 'user' ? 'flex-row-reverse' : ''}`}
+          >
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold ${msg.sender === 'user' ? 'bg-blue-600' : 'bg-zinc-700'}`}>
+              {msg.sender === 'user' ? 'Y' : 'H'}
+            </div>
+            <div className={`rounded-lg px-4 py-2 shadow text-sm max-w-xl ${msg.sender === 'user' ? 'bg-blue-100' : 'bg-white'}`}>{msg.text}</div>
+          </div>
+        ))}
       </div>
       {/* Message input */}
-      <form className="px-6 py-4 border-t border-zinc-200 bg-white flex items-center gap-3">
-        <input
-          type="text"
-          placeholder="Type your message here..."
-          className="flex-1 px-4 py-2 rounded bg-zinc-100 focus:outline-none"
-        />
-        <button type="submit" className="px-4 py-2 rounded bg-blue-600 text-white font-semibold hover:bg-blue-700">Send</button>
-      </form>
+      <ChatInput onSendMessage={onSendMessage} isLoading={isLoading} />
     </section>
   );
 } 
