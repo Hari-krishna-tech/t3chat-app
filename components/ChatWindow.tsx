@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import ChatInput from './ChatInput';
 import { ModelType } from '@/lib/models';
-import { marked } from 'marked';
+import ReactMarkdown from 'react-markdown';
 
 interface Message {
   id: string;
@@ -38,18 +38,11 @@ export default function ChatWindow() {
         const { value, done } = await reader.read();
         if (done) break;
         text += new TextDecoder().decode(value);
-        let html = '';
-        try {
-          html = await marked.parse(text);
-        } catch (err) {
-          console.error("Error parsing markdown:", err);
-        } finally {
         setMessages((msgs) =>
           msgs.map((m) =>
-            m.id === botMsg.id ? { ...m,  html: html || text } : m
+            m.id === botMsg.id ? { ...m,  text } : m
           )
         );
-        }
       }
     } catch (err) {
       console.error("Error getting response:", err);
@@ -81,7 +74,9 @@ export default function ChatWindow() {
             <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold ${msg.sender === 'user' ? 'bg-blue-600' : 'bg-zinc-700'}`}>
               {msg.sender === 'user' ? 'Y' : 'H'}
             </div>
-            <div className={`rounded-lg px-4 py-2 shadow text-sm max-w-xl ${msg.sender === 'user' ? 'bg-blue-100' : 'bg-white'}`}>{msg.text}</div>
+            <div className={`rounded-lg px-4 py-2 shadow text-sm max-w-xl ${msg.sender === 'user' ? 'bg-blue-100' : 'bg-white'}`}>
+              <ReactMarkdown>{msg.text}</ReactMarkdown>
+            </div>
           </div>
         ))}
       </div>
