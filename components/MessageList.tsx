@@ -1,6 +1,7 @@
 "use client";
 
 import { User } from "@prisma/client";
+import Image from "next/image";
 
 type Message = {
   id: string;
@@ -24,10 +25,12 @@ export function MessageList({ messages }: MessageListProps) {
           key={message.id}
           className="flex items-start gap-4 rounded-lg border p-4"
         >
-          <img
+          <Image
             src={message.user.image || ""}
             alt={message.user.name || ""}
-            className="h-8 w-8 rounded-full"
+            width={32}
+            height={32}
+            className="rounded-full"
           />
           <div className="flex-1 space-y-1">
             <div className="flex items-center gap-2">
