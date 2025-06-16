@@ -8,6 +8,9 @@ export async function POST(req: NextRequest) {
   const { message, model } = await req.json();
   const encoder = new TextEncoder();
 
+  console.log("message", message);
+  console.log("model", model);
+
   const stream = new ReadableStream({
     async start(controller) {
       try {
