@@ -26,8 +26,10 @@ export async function* streamModelResponse(model: ModelType, prompt: string) {
 
 async function* streamGemini20FlashResponse(prompt: string) {
   try {
+    // add system prompt
+    const systemPrompt = "You are a helpful assistant. answer in markdown format. be concise and to the point.";
     const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-    const result = await model.generateContentStream(prompt);
+    const result = await model.generateContentStream(systemPrompt + "\n\n" + prompt);
 
     for await (const chunk of result.stream) {
       const text = chunk.text();
