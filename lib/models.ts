@@ -1,4 +1,4 @@
-export type ModelType = 'gemini-pro' | 'gpt-4' | 'gpt-3.5-turbo' | 'claude-3-opus';
+export type ModelType = 'gemini-pro' | 'gemini-2.0-flash' | 'gpt-4' | 'gpt-3.5-turbo' | 'claude-3-opus';
 
 export interface ModelConfig {
   id: ModelType;
@@ -13,6 +13,14 @@ export const MODELS: ModelConfig[] = [
   {
     id: 'gemini-pro',
     name: 'Gemini Pro',
+    provider: 'google',
+    description: 'Google\'s most capable model for text generation',
+    maxTokens: 32768,
+    requiresKey: true,
+  },
+  {
+    id: 'gemini-2.0-flash',
+    name: 'Gemini 2.0 Flash',
     provider: 'google',
     description: 'Google\'s most capable model for text generation',
     maxTokens: 32768,
