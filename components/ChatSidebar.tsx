@@ -1,9 +1,11 @@
 "use client";
 
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export default function ChatSidebar() {
   const { data: session } = useSession();
+  const router = useRouter();
 
   return (
     <aside className="flex flex-col h-full w-72 bg-zinc-900 text-white border-r border-zinc-800">
@@ -31,7 +33,10 @@ export default function ChatSidebar() {
         </ul>
       </div>
       {/* User Profile */}
-      <div className="p-4 border-t border-zinc-800 flex items-center gap-3">
+      <div 
+        className="p-4 border-t border-zinc-800 flex items-center gap-3 cursor-pointer hover:bg-zinc-800"
+        onClick={() => router.push('/settings')}
+      >
         {session?.user?.image ? (
           <img
             src={session.user.image}
