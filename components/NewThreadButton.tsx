@@ -3,7 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-export function NewThreadButton() {
+interface NewThreadButtonProps {
+  className?: string;
+}
+
+export function NewThreadButton({ className = "" }: NewThreadButtonProps) {
   const [isCreating, setIsCreating] = useState(false);
   const router = useRouter();
 
@@ -38,7 +42,7 @@ export function NewThreadButton() {
     <button
       onClick={createNewThread}
       disabled={isCreating}
-      className="w-full flex items-center gap-2 rounded-lg border p-3 text-sm transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50"
+      className={`flex items-center gap-2 rounded-lg border p-3 text-sm transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"

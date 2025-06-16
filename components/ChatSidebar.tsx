@@ -2,6 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { NewThreadButton } from "./NewThreadButton";
 
 export default function ChatSidebar() {
   const { data: session } = useSession();
@@ -11,7 +12,7 @@ export default function ChatSidebar() {
     <aside className="flex flex-col h-full w-72 bg-zinc-900 text-white border-r border-zinc-800">
       {/* Header */}
       <div className="p-4 border-b border-zinc-800">
-        <button className="w-full py-2 rounded bg-zinc-800 hover:bg-zinc-700 font-semibold">New Chat</button>
+        <NewThreadButton className="w-full bg-zinc-800 hover:bg-zinc-700 text-white border-zinc-700" />
       </div>
       {/* Search */}
       <div className="p-4 border-b border-zinc-800">

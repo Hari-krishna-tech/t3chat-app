@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import ChatInput from './ChatInput';
 import { ModelType } from '@/lib/models';
 import ReactMarkdown from 'react-markdown';
+import { NewThreadButton } from './NewThreadButton';
 
 interface Message {
   id: string;
@@ -62,7 +63,7 @@ export default function ChatWindow() {
       {/* Header */}
       <header className="px-6 py-4 border-b border-zinc-200 bg-white/80 backdrop-blur flex items-center justify-between">
         <h1 className="text-lg font-bold">T3.chat</h1>
-        <button className="px-3 py-1 rounded bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-sm">New Chat</button>
+        <NewThreadButton className="px-3 py-1 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 border-zinc-200" />
       </header>
       {/* Chat messages */}
       <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4 bg-zinc-50">
