@@ -35,6 +35,7 @@ export default function ChatWindow() {
       let text = '';
       while (true) {
         const { value, done } = await reader.read();
+        console.log("value", value);
         if (done) break;
         text += new TextDecoder().decode(value);
         setMessages((msgs) =>
