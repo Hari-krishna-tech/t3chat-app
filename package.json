@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.9.1",
+    "@google/generative-ai": "^0.24.1",
     "@prisma/client": "^5.4.1",
     "@types/ms": "^0.7.32",
     "@types/node": "20.8.3",
