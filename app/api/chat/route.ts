@@ -19,6 +19,8 @@ export async function POST(req: NextRequest) {
         }
         controller.close();
       } catch (err) {
+        console.error("Model streaming error:", err); // <-- Add this line
+
         controller.enqueue(encoder.encode("Error getting response."));
         controller.close();
       }
