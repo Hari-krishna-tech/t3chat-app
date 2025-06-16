@@ -1,3 +1,4 @@
+"use client";
 import React, { useState } from 'react';
 import ChatInput from './ChatInput';
 import { ModelType } from '@/lib/models';
