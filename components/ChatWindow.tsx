@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import ChatInput from './ChatInput';
 import { ModelType } from '@/lib/models';
+import { marked } from 'marked';
 
 interface Message {
   id: string;
@@ -35,22 +36,26 @@ export default function ChatWindow() {
       let text = '';
       while (true) {
         const { value, done } = await reader.read();
-        console.log("value", value);
+        // console.log("value", value);
         if (done) break;
         text += new TextDecoder().decode(value);
+        // parse the markdown
+        const html = marked.parse(text);
+        console.log("html", html);
         setMessages((msgs) =>
           msgs.map((m) =>
-            m.id === botMsg.id ? { ...m, text } : m
+            m.id === botMsg.id ? { ...m,  html } : m
           )
         );
       }
     } catch (err) {
       setMessages((msgs) =>
         msgs.map((m) =>
-          m.id === botMsg.id ? { ...m, text: 'Error getting response. xxxx:' + (err as Error).message } : m
+          m.id === botMsg.id ? { ...m, text: 'Error getting response.'  } : m
         )
       );
     } finally {
+
       setIsLoading(false);
     }
   };
