@@ -36,12 +36,10 @@ export default function ChatWindow() {
       let text = '';
       while (true) {
         const { value, done } = await reader.read();
-        // console.log("value", value);
         if (done) break;
         text += new TextDecoder().decode(value);
         // parse the markdown
         const html = marked.parse(text);
-        console.log("html", html);
         setMessages((msgs) =>
           msgs.map((m) =>
             m.id === botMsg.id ? { ...m,  html } : m
@@ -49,6 +47,7 @@ export default function ChatWindow() {
         );
       }
     } catch (err) {
+      console.error("Error getting response:", err);
       setMessages((msgs) =>
         msgs.map((m) =>
           m.id === botMsg.id ? { ...m, text: 'Error getting response.'  } : m
