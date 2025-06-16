@@ -38,11 +38,15 @@ export default function ChatWindow() {
         const { value, done } = await reader.read();
         if (done) break;
         text += new TextDecoder().decode(value);
-        // parse the markdown
-        const html = marked.parse(text);
+        let html = '';
+        try {
+          html = await marked.parse(text);
+        } catch (err) {
+          console.error("Error parsing markdown:", err);
+        }
         setMessages((msgs) =>
           msgs.map((m) =>
-            m.id === botMsg.id ? { ...m,  html } : m
+            m.id === botMsg.id ? { ...m,  html: html || text } : m
           )
         );
       }
