@@ -43,12 +43,13 @@ export default function ChatWindow() {
           html = await marked.parse(text);
         } catch (err) {
           console.error("Error parsing markdown:", err);
-        }
+        } finally {
         setMessages((msgs) =>
           msgs.map((m) =>
             m.id === botMsg.id ? { ...m,  html: html || text } : m
           )
         );
+        }
       }
     } catch (err) {
       console.error("Error getting response:", err);
