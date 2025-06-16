@@ -1,11 +1,19 @@
-import { Message, User } from "@prisma/client";
+"use client";
 
-type MessageWithUser = Message & {
+import { User } from "@prisma/client";
+
+type Message = {
+  id: string;
+  content: string;
+  createdAt: Date;
+  userId: string;
+  threadId: string | null;
+  chatId: string | null;
   user: User;
 };
 
 interface MessageListProps {
-  messages: MessageWithUser[];
+  messages: Message[];
 }
 
 export function MessageList({ messages }: MessageListProps) {
