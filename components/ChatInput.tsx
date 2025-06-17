@@ -11,7 +11,7 @@ interface ChatInputProps {
 
 export default function ChatInput({ onSendMessage, isLoading }: ChatInputProps) {
   const [message, setMessage] = useState("");
-  const [selectedModel, setSelectedModel] = useState<ModelType>("gemini-pro");
+  const [selectedModel, setSelectedModel] = useState<ModelType>("gemini-2.0-flash");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

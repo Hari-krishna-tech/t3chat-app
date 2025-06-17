@@ -9,37 +9,14 @@ interface NewThreadButtonProps {
 export function NewThreadButton({ className = "" }: NewThreadButtonProps) {
   const [isCreating, setIsCreating] = useState(false);
 
-  const createNewThread = async () => {
-    try {
-      setIsCreating(true);
-      const response = await fetch("/api/threads", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title: "New Chat",
-          message: "Hello! How can I help you today?",
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to create thread");
-      }
-
-      const thread = await response.json();
-      // Emit an event that the main chat window can listen to
-      window.dispatchEvent(new CustomEvent("threadSelected", { detail: { threadId: thread.id } }));
-    } catch (error) {
-      console.error("Error creating thread:", error);
-    } finally {
-      setIsCreating(false);
-    }
+  const startNewChat = () => {
+    // Emit an event that the main chat window can listen to
+    window.dispatchEvent(new CustomEvent("newChatStarted"));
   };
 
   return (
     <button
-      onClick={createNewThread}
+      onClick={startNewChat}
       disabled={isCreating}
       className={`flex items-center gap-2 rounded-lg border p-3 text-sm transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
     >
@@ -55,7 +32,7 @@ export function NewThreadButton({ className = "" }: NewThreadButtonProps) {
       >
         <path d="M12 5v14M5 12h14" />
       </svg>
-      {isCreating ? "Creating..." : "New Chat"}
+      New Chat
     </button>
   );
 } 

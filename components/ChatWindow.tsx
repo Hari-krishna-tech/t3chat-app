@@ -21,16 +21,24 @@ export default function ChatWindow() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [currentThreadId, setCurrentThreadId] = useState<string | null>(null);
+  const [pendingNewThread, setPendingNewThread] = useState(false);
 
   useEffect(() => {
     const handleThreadSelect = (event: CustomEvent<{ threadId: string }>) => {
       setCurrentThreadId(event.detail.threadId);
+      setPendingNewThread(false);
       fetchThreadMessages(event.detail.threadId);
     };
-
+    const handleNewChatStarted = () => {
+      setCurrentThreadId(null);
+      setMessages([]);
+      setPendingNewThread(true);
+    };
     window.addEventListener('threadSelected', handleThreadSelect as EventListener);
+    window.addEventListener('newChatStarted', handleNewChatStarted);
     return () => {
       window.removeEventListener('threadSelected', handleThreadSelect as EventListener);
+      window.removeEventListener('newChatStarted', handleNewChatStarted);
     };
   }, []);
 
@@ -46,9 +54,94 @@ export default function ChatWindow() {
     }
   };
 
-  const onSendMessage = async (message: string, model: ModelType) => {
-    if (!currentThreadId) return;
+  const createThreadAndSendMessage = async (message: string, model: ModelType) => {
+    try {
+      setIsLoading(true);
+      // Create the thread
+      const threadRes = await fetch('/api/threads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: message.substring(0, 30) || 'New Chat',
+          message,
+        }),
+      });
+      if (!threadRes.ok) throw new Error('Failed to create thread');
+      const thread = await threadRes.json();
+      setCurrentThreadId(thread.id);
+      setPendingNewThread(false);
+      setMessages(thread.messages);
+      // Now, get AI response as normal
+      await getAIResponse(message, model, thread.id);
+    } catch (err) {
+      console.error('Error creating thread and sending message:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  const getAIResponse = async (message: string, model: ModelType, threadId: string) => {
+    // Then, get AI response
+    const aiResponse = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message, model }),
+    });
+    if (!aiResponse.ok) {
+      throw new Error('Failed to get AI response');
+    }
+    // Create a temporary message for the AI response
+    const tempAiMessage: Message = {
+      id: 'temp-' + Date.now(),
+      content: '',
+      createdAt: new Date(),
+      userId: 'ai',
+      isAi: true,
+      user: {
+        name: 'AI Assistant',
+        image: null,
+      },
+    };
+    setMessages((prev) => [...prev, tempAiMessage]);
+    // Stream the AI response
+    const reader = aiResponse.body?.getReader();
+    if (!reader) throw new Error('No response body');
+    let aiContent = '';
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      aiContent += new TextDecoder().decode(value);
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === tempAiMessage.id ? { ...m, content: aiContent } : m
+        )
+      );
+    }
+    // Save the AI response to the database
+    const finalAiResponse = await fetch('/api/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        content: aiContent,
+        threadId,
+        isAi: true,
+      }),
+    });
+    if (!finalAiResponse.ok) {
+      throw new Error('Failed to save AI response');
+    }
+    const savedAiMessage = await finalAiResponse.json();
+    setMessages((prev) =>
+      prev.map((m) => (m.id === tempAiMessage.id ? savedAiMessage : m))
+    );
+  };
+
+  const onSendMessage = async (message: string, model: ModelType) => {
+    if (pendingNewThread) {
+      await createThreadAndSendMessage(message, model);
+      return;
+    }
+    if (!currentThreadId) return;
     try {
       setIsLoading(true);
       // First, send the user's message
@@ -61,76 +154,14 @@ export default function ChatWindow() {
           isAi: false,
         }),
       });
-
       if (!userResponse.ok) {
-        throw new Error("Failed to send message");
+        throw new Error('Failed to send message');
       }
-
       const userMessage = await userResponse.json();
       setMessages((prev) => [...prev, userMessage]);
-
-      // Then, get AI response
-      const aiResponse = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message, model }),
-      });
-
-      if (!aiResponse.ok) {
-        throw new Error("Failed to get AI response");
-      }
-
-      // Create a temporary message for the AI response
-      const tempAiMessage: Message = {
-        id: 'temp-' + Date.now(),
-        content: '',
-        createdAt: new Date(),
-        userId: 'ai',
-        isAi: true,
-        user: {
-          name: 'AI Assistant',
-          image: null,
-        },
-      };
-      setMessages((prev) => [...prev, tempAiMessage]);
-
-      // Stream the AI response
-      const reader = aiResponse.body?.getReader();
-      if (!reader) throw new Error("No response body");
-
-      let aiContent = '';
-      while (true) {
-        const { value, done } = await reader.read();
-        if (done) break;
-        aiContent += new TextDecoder().decode(value);
-        setMessages((prev) =>
-          prev.map((m) =>
-            m.id === tempAiMessage.id ? { ...m, content: aiContent } : m
-          )
-        );
-      }
-
-      // Save the AI response to the database
-      const finalAiResponse = await fetch('/api/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          content: aiContent,
-          threadId: currentThreadId,
-          isAi: true,
-        }),
-      });
-
-      if (!finalAiResponse.ok) {
-        throw new Error("Failed to save AI response");
-      }
-
-      const savedAiMessage = await finalAiResponse.json();
-      setMessages((prev) =>
-        prev.map((m) => (m.id === tempAiMessage.id ? savedAiMessage : m))
-      );
+      await getAIResponse(message, model, currentThreadId);
     } catch (err) {
-      console.error("Error in message flow:", err);
+      console.error('Error in message flow:', err);
     } finally {
       setIsLoading(false);
     }
@@ -145,6 +176,9 @@ export default function ChatWindow() {
       </header>
       {/* Chat messages */}
       <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4 bg-zinc-50">
+        {messages.length === 0 && pendingNewThread && (
+          <div className="text-zinc-400 text-center mt-10">Start a new conversation...</div>
+        )}
         {messages.map((msg) => (
           <div
             key={msg.id}
