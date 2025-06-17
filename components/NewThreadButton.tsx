@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 
 interface NewThreadButtonProps {
   className?: string;
@@ -9,7 +8,6 @@ interface NewThreadButtonProps {
 
 export function NewThreadButton({ className = "" }: NewThreadButtonProps) {
   const [isCreating, setIsCreating] = useState(false);
-  const router = useRouter();
 
   const createNewThread = async () => {
     try {
@@ -30,7 +28,8 @@ export function NewThreadButton({ className = "" }: NewThreadButtonProps) {
       }
 
       const thread = await response.json();
-      router.push(`/thread/${thread.id}`);
+      // Emit an event that the main chat window can listen to
+      window.dispatchEvent(new CustomEvent("threadSelected", { detail: { threadId: thread.id } }));
     } catch (error) {
       console.error("Error creating thread:", error);
     } finally {

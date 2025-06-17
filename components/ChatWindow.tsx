@@ -1,59 +1,73 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ChatInput from './ChatInput';
 import { ModelType } from '@/lib/models';
 import ReactMarkdown from 'react-markdown';
 import { NewThreadButton } from './NewThreadButton';
 
-interface Message {
+type Message = {
   id: string;
-  text: string;
-  sender: 'user' | 'bot';
-}
+  content: string;
+  createdAt: Date;
+  userId: string;
+  user: {
+    name: string | null;
+    image: string | null;
+  };
+};
 
 export default function ChatWindow() {
-  const [messages, setMessages] = useState<Message[]>([
-    { id: '1', text: 'Hello! How can I help you today?', sender: 'bot' },
-    { id: '2', text: 'I want to build a chat app UI like this.', sender: 'user' },
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [currentThreadId, setCurrentThreadId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const handleThreadSelect = (event: CustomEvent<{ threadId: string }>) => {
+      setCurrentThreadId(event.detail.threadId);
+      fetchThreadMessages(event.detail.threadId);
+    };
+
+    window.addEventListener('threadSelected', handleThreadSelect as EventListener);
+    return () => {
+      window.removeEventListener('threadSelected', handleThreadSelect as EventListener);
+    };
+  }, []);
+
+  const fetchThreadMessages = async (threadId: string) => {
+    try {
+      const response = await fetch(`/api/threads/${threadId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setMessages(data.messages);
+      }
+    } catch (error) {
+      console.error("Error fetching thread messages:", error);
+    }
+  };
 
   const onSendMessage = async (message: string, model: ModelType) => {
-    const userMsg: Message = { id: Date.now() + '-user', text: message, sender: 'user' };
-    setMessages((msgs) => [...msgs, userMsg]);
-    setIsLoading(true);
-    let botMsg: Message = { id: Date.now() + '-bot', text: '', sender: 'bot' };
-    setMessages((msgs) => [...msgs, botMsg]);
+    if (!currentThreadId) return;
+
     try {
-      const res = await fetch('/api/chat', {
+      setIsLoading(true);
+      const response = await fetch('/api/messages', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message, model }),
+        body: JSON.stringify({
+          content: message,
+          threadId: currentThreadId,
+        }),
       });
 
-      if (!res.body) throw new Error("No response body");
-
-      const reader = res.body.getReader();
-      let text = '';
-      while (true) {
-        const { value, done } = await reader.read();
-        if (done) break;
-        text += new TextDecoder().decode(value);
-        setMessages((msgs) =>
-          msgs.map((m) =>
-            m.id === botMsg.id ? { ...m,  text } : m
-          )
-        );
+      if (!response.ok) {
+        throw new Error("Failed to send message");
       }
-    } catch (err) {
-      console.error("Error getting response:", err);
-      setMessages((msgs) =>
-        msgs.map((m) =>
-          m.id === botMsg.id ? { ...m, text: 'Error getting response.'  } : m
-        )
-      );
-    } finally {
 
+      const newMessage = await response.json();
+      setMessages((prev) => [...prev, newMessage]);
+    } catch (err) {
+      console.error("Error sending message:", err);
+    } finally {
       setIsLoading(false);
     }
   };
@@ -70,13 +84,13 @@ export default function ChatWindow() {
         {messages.map((msg) => (
           <div
             key={msg.id}
-            className={`flex gap-3 items-start ${msg.sender === 'user' ? 'flex-row-reverse' : ''}`}
+            className="flex gap-3 items-start"
           >
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold ${msg.sender === 'user' ? 'bg-blue-600' : 'bg-zinc-700'}`}>
-              {msg.sender === 'user' ? 'Y' : 'H'}
+            <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold bg-zinc-700">
+              {msg.user.name?.[0] || 'U'}
             </div>
-            <div className={`rounded-lg px-4 py-2 shadow text-sm max-w-xl ${msg.sender === 'user' ? 'bg-blue-100' : 'bg-white'}`}>
-              <ReactMarkdown>{msg.text}</ReactMarkdown>
+            <div className="rounded-lg px-4 py-2 shadow text-sm max-w-xl bg-white">
+              <ReactMarkdown>{msg.content}</ReactMarkdown>
             </div>
           </div>
         ))}
