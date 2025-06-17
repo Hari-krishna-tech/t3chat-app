@@ -5,9 +5,12 @@ import { ModelType } from "@/lib/models";
 export const runtime = "edge"; // or "nodejs" if you need node APIs
 
 export async function POST(req: NextRequest) {
-  const { messages, model, isTitle } = await req.json();
+  let{ messages, model, isTitle } = await req.json();
   const encoder = new TextEncoder();
 
+  if(isTitle) {
+    messages = messages as string;
+  }
   console.log("messages", messages);
   console.log("model", model);
 
