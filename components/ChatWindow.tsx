@@ -21,7 +21,7 @@ export default function ChatWindow() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [currentThreadId, setCurrentThreadId] = useState<string | null>(null);
-  const [pendingNewThread, setPendingNewThread] = useState(false);
+  const [pendingNewThread, setPendingNewThread] = useState(true);
 
   useEffect(() => {
     const handleThreadSelect = (event: CustomEvent<{ threadId: string }>) => {

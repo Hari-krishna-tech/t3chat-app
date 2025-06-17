@@ -17,6 +17,7 @@ export default function ChatSidebar() {
   const router = useRouter();
   const [threads, setThreads] = useState<Thread[]>([]);
   const [selectedThreadId, setSelectedThreadId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     const fetchThreads = async () => {
@@ -52,13 +53,19 @@ export default function ChatSidebar() {
           type="text"
           placeholder="Search your threads..."
           className="w-full px-3 py-2 rounded bg-zinc-800 text-white placeholder-zinc-400 focus:outline-none"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
         />
       </div>
       {/* Threads List */}
       <div className="flex-1 overflow-y-auto">
         <div className="px-4 pt-4 pb-2 text-xs text-zinc-400 font-semibold">Your Threads</div>
         <ul className="px-2 space-y-1">
-          {threads.map((thread) => (
+          {threads
+            .filter((thread) =>
+              thread.title.toLowerCase().includes(searchQuery.toLowerCase())
+            )
+            .map((thread) => (
             <li
               key={thread.id}
               onClick={() => handleThreadSelect(thread.id)}
