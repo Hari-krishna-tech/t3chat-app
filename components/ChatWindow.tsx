@@ -256,7 +256,9 @@ export default function ChatWindow() {
         ))}
       </div>
       {/* Message input */}
-      <ChatInput onSendMessage={onSendMessage} isLoading={isLoading} />
+      <div className="h-[20%] min-h-[100px] flex items-end">
+        <ChatInput onSendMessage={onSendMessage} isLoading={isLoading} />
+      </div>
     </section>
   );
 } 
