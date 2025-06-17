@@ -246,8 +246,8 @@ export default function ChatWindow() {
             <div
               className={`rounded-lg px-4 py-2 shadow text-sm max-w-xl
                 ${msg.isAi
-                  ? 'bg-background-dark text-foreground border border-accent-purple/10'
-                  : 'bg-accent-purple/20 text-accent-purple border border-accent-purple/40'}
+                  ? 'bg-background-dark text-foreground'
+                  : 'bg-accent-purple/20 text-accent-purple'}
               `}
             >
               <ReactMarkdown>{msg.content}</ReactMarkdown>
