@@ -39,3 +39,36 @@ input, textarea, select, button {
   color: rgb(var(--foreground-rgb));
   background: rgb(var(--background-dark-rgb));
 }
+
+/* Markdown and chat message content */
+.markdown, .prose, .chat-message {
+  color: rgb(var(--foreground-rgb));
+}
+.markdown a, .prose a {
+  color: rgb(var(--accent-purple));
+  text-decoration: underline;
+}
+.markdown code, .prose code {
+  background: rgb(var(--background-dark-rgb));
+  color: rgb(var(--accent-purple));
+  padding: 0.2em 0.4em;
+  border-radius: 4px;
+  font-size: 0.95em;
+}
+.markdown pre, .prose pre {
+  background: rgb(var(--background-dark-rgb));
+  color: rgb(var(--foreground-rgb));
+  border-radius: 8px;
+  padding: 1em;
+  overflow-x: auto;
+}
+
+/* Scrollbar styling for dark mode */
+::-webkit-scrollbar {
+  width: 8px;
+  background: rgb(var(--background-dark-rgb));
+}
+::-webkit-scrollbar-thumb {
+  background: rgb(var(--accent-purple-dark));
+  border-radius: 8px;
+}

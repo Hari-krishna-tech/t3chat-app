@@ -227,16 +227,16 @@ export default function ChatWindow() {
   };
 
   return (
-    <section className="flex flex-col flex-1 h-full">
+    <section className="flex flex-col flex-1 h-full bg-background">
       {/* Header */}
-      <header className="px-6 py-4 border-b border-zinc-200 bg-white/80 backdrop-blur flex items-center justify-between">
-        <h1 className="text-lg font-bold">T3.chat</h1>
-        <NewThreadButton className="px-3 py-1 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 border-zinc-200" />
+      <header className="px-6 py-4 border-b border-background-dark bg-background-dark/90 backdrop-blur flex items-center justify-between">
+        <h1 className="text-lg font-bold text-accent-purple">T3.chat</h1>
+        <NewThreadButton className="px-3 py-1 bg-accent-purple hover:bg-accent-dark text-white border-none shadow" />
       </header>
       {/* Chat messages */}
-      <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4 bg-zinc-50">
+      <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4 bg-background">
         {messages.length === 0 && pendingNewThread && (
-          <div className="text-zinc-400 text-center mt-10">Start a new conversation...</div>
+          <div className="text-zinc-500 text-center mt-10">Start a new conversation...</div>
         )}
         {messages.map((msg) => (
           <div
@@ -245,7 +245,10 @@ export default function ChatWindow() {
           >
             <div
               className={`rounded-lg px-4 py-2 shadow text-sm max-w-xl
-                ${msg.isAi ? 'bg-white text-left' : 'bg-blue-100 text-right'}`}
+                ${msg.isAi
+                  ? 'bg-background-dark text-foreground border border-accent-purple/10'
+                  : 'bg-accent-purple/20 text-accent-purple border border-accent-purple/40'}
+              `}
             >
               <ReactMarkdown>{msg.content}</ReactMarkdown>
             </div>
