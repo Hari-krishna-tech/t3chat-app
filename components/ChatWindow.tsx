@@ -20,8 +20,18 @@ type Message = {
 export default function ChatWindow() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [currentThreadId, setCurrentThreadId] = useState<string | null>(null);
-  const [pendingNewThread, setPendingNewThread] = useState(true);
+  const [currentThreadId, setCurrentThreadId] = useState<string | null>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('selectedThreadId');
+    }
+    return null;
+  });
+  const [pendingNewThread, setPendingNewThread] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return !localStorage.getItem('selectedThreadId');
+    }
+    return true;
+  });
 
   useEffect(() => {
     const handleThreadSelect = (event: CustomEvent<{ threadId: string }>) => {
@@ -41,6 +51,13 @@ export default function ChatWindow() {
       window.removeEventListener('newChatStarted', handleNewChatStarted);
     };
   }, []);
+
+  useEffect(() => {
+    // If there's a selected thread on load, fetch its messages
+    if (currentThreadId && !pendingNewThread) {
+      fetchThreadMessages(currentThreadId);
+    }
+  }, [currentThreadId, pendingNewThread]);
 
   const fetchThreadMessages = async (threadId: string) => {
     try {
