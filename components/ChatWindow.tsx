@@ -62,7 +62,7 @@ export default function ChatWindow() {
       const titleRes = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: titlePrompt, model , isTitle: true}),
+        body: JSON.stringify({ messages: titlePrompt, model , isTitle: true}),
       });
       let title = 'New Chat';
       if (titleRes.ok && titleRes.body) {
