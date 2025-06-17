@@ -11,7 +11,7 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const { content, threadId } = body;
+    const { content, threadId, isAi } = body;
 
     if (!content || !threadId) {
       return new NextResponse("Missing required fields", { status: 400 });
@@ -30,13 +30,25 @@ export async function POST(req: Request) {
     const message = await prisma.message.create({
       data: {
         content,
-        userId: user.id,
+        userId: isAi ? 'ai' : user.id, // Use 'ai' as userId for AI messages
         threadId,
       },
       include: {
         user: true,
       },
     });
+
+    // If this is an AI message, create a system user for it
+    if (isAi) {
+      message.user = {
+        id: 'ai',
+        name: 'AI Assistant',
+        email: null,
+        emailVerified: null,
+        image: null,
+        createdAt: new Date(),
+      };
+    }
 
     return NextResponse.json(message);
   } catch (error) {

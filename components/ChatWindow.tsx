@@ -50,7 +50,8 @@ export default function ChatWindow() {
 
     try {
       setIsLoading(true);
-      const response = await fetch('/api/messages', {
+      // First, send the user's message
+      const userResponse = await fetch('/api/messages', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -59,14 +60,74 @@ export default function ChatWindow() {
         }),
       });
 
-      if (!response.ok) {
+      if (!userResponse.ok) {
         throw new Error("Failed to send message");
       }
 
-      const newMessage = await response.json();
-      setMessages((prev) => [...prev, newMessage]);
+      const userMessage = await userResponse.json();
+      setMessages((prev) => [...prev, userMessage]);
+
+      // Then, get AI response
+      const aiResponse = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message, model }),
+      });
+
+      if (!aiResponse.ok) {
+        throw new Error("Failed to get AI response");
+      }
+
+      // Create a temporary message for the AI response
+      const tempAiMessage: Message = {
+        id: 'temp-' + Date.now(),
+        content: '',
+        createdAt: new Date(),
+        userId: 'ai',
+        user: {
+          name: 'AI Assistant',
+          image: null,
+        },
+      };
+      setMessages((prev) => [...prev, tempAiMessage]);
+
+      // Stream the AI response
+      const reader = aiResponse.body?.getReader();
+      if (!reader) throw new Error("No response body");
+
+      let aiContent = '';
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        aiContent += new TextDecoder().decode(value);
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === tempAiMessage.id ? { ...m, content: aiContent } : m
+          )
+        );
+      }
+
+      // Save the AI response to the database
+      const finalAiResponse = await fetch('/api/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content: aiContent,
+          threadId: currentThreadId,
+          isAi: true,
+        }),
+      });
+
+      if (!finalAiResponse.ok) {
+        throw new Error("Failed to save AI response");
+      }
+
+      const savedAiMessage = await finalAiResponse.json();
+      setMessages((prev) =>
+        prev.map((m) => (m.id === tempAiMessage.id ? savedAiMessage : m))
+      );
     } catch (err) {
-      console.error("Error sending message:", err);
+      console.error("Error in message flow:", err);
     } finally {
       setIsLoading(false);
     }
