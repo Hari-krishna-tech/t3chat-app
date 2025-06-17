@@ -148,12 +148,12 @@ export default function ChatWindow() {
         {messages.map((msg) => (
           <div
             key={msg.id}
-            className="flex gap-3 items-start"
+            className={`flex ${msg.isAi ? 'justify-start' : 'justify-end'}`}
           >
-            <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold bg-zinc-700">
-              {msg.isAi ? 'AI' : msg.user.name?.[0] || 'U'}
-            </div>
-            <div className="rounded-lg px-4 py-2 shadow text-sm max-w-xl bg-white">
+            <div
+              className={`rounded-lg px-4 py-2 shadow text-sm max-w-xl
+                ${msg.isAi ? 'bg-white text-left' : 'bg-blue-100 text-right'}`}
+            >
               <ReactMarkdown>{msg.content}</ReactMarkdown>
             </div>
           </div>
