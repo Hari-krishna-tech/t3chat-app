@@ -16,12 +16,17 @@ type MessageType = {
   };
 };
 
-export async function* streamModelResponse(model: ModelType, messages: string | MessageType[]) {
+export async function* streamModelResponse(model: ModelType, messages: string | MessageType[], isTitle: boolean) {
   // Convert messages to string if needed
-  const messageString = Array.isArray(messages)
+  let messageString = "";
+  if(isTitle) {
+    messageString = messages as string;
+  } else {
+    messageString = Array.isArray(messages)
     // here m is the MessageType
     ? messages.map(m => m.content).join("\n\n")
     : messages;
+  }
 
   switch (model) {
     case "gemini-pro":

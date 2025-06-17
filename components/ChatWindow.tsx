@@ -62,7 +62,7 @@ export default function ChatWindow() {
       const titleRes = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: titlePrompt, model }),
+        body: JSON.stringify({ message: titlePrompt, model , isTitle: true}),
       });
       let title = 'New Chat';
       if (titleRes.ok && titleRes.body) {
@@ -116,7 +116,7 @@ export default function ChatWindow() {
     const aiResponse = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages: contextMessages, model }),
+      body: JSON.stringify({ messages: contextMessages, model, isTitle: false }),
     });
     if (!aiResponse.ok) {
       throw new Error('Failed to get AI response');
