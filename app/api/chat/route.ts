@@ -5,16 +5,16 @@ import { ModelType } from "@/lib/models";
 export const runtime = "edge"; // or "nodejs" if you need node APIs
 
 export async function POST(req: NextRequest) {
-  const { message, model } = await req.json();
+  const { messages, model } = await req.json();
   const encoder = new TextEncoder();
 
-  console.log("message", message);
+  console.log("messages", messages);
   console.log("model", model);
 
   const stream = new ReadableStream({
     async start(controller) {
       try {
-        for await (const chunk of streamModelResponse(model as ModelType, message)) {
+        for await (const chunk of streamModelResponse(model as ModelType, messages)) {
           controller.enqueue(encoder.encode(chunk));
         }
         controller.close();
