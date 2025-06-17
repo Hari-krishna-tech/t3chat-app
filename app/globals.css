@@ -4,17 +4,38 @@
 
 :root {
   --foreground-rgb: 232, 230, 255;
-  --background-start-rgb: 24, 20, 36;
-  --background-end-rgb: 34, 28, 54;
+  --background-rgb: 18, 16, 24;
+  --background-dark-rgb: 24, 20, 36;
   --accent-purple: 139, 92, 246; /* Tailwind purple-500 */
   --accent-purple-dark: 91, 33, 182; /* Tailwind purple-800 */
 }
 
-body {
+html, body {
+  height: 100%;
+  min-height: 100vh;
+  background: rgb(var(--background-rgb));
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      120deg,
-      rgb(var(--background-start-rgb)) 0%,
-      rgb(var(--background-end-rgb)) 100%
-    );
+  box-sizing: border-box;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body, #__next, #root {
+  min-height: 100vh;
+  background: rgb(var(--background-rgb));
+  color: rgb(var(--foreground-rgb));
+}
+
+* {
+  box-sizing: inherit;
+}
+
+::selection {
+  background: rgba(var(--accent-purple), 0.3);
+}
+
+input, textarea, select, button {
+  color: rgb(var(--foreground-rgb));
+  background: rgb(var(--background-dark-rgb));
 }
