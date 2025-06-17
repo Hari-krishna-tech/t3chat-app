@@ -81,6 +81,7 @@ model Message {
   thread    Thread?  @relation(fields: [threadId], references: [id], onDelete: Cascade)
   chatId    String?  // Optional: if message belongs to a chat
   chat      Chat?    @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  isAi      Boolean  @default(false) // Whether this message is from AI
 }
 
 model Chat {

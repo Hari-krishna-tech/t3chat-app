@@ -30,23 +30,21 @@ export async function POST(req: Request) {
     const message = await prisma.message.create({
       data: {
         content,
-        userId: isAi ? 'ai' : user.id, // Use 'ai' as userId for AI messages
+        userId: user.id, // Always use the real user ID
         threadId,
+        isAi: isAi || false, // Set isAi flag
       },
       include: {
         user: true,
       },
     });
 
-    // If this is an AI message, create a system user for it
+    // If this is an AI message, modify the user object to show AI information
     if (isAi) {
       message.user = {
-        id: 'ai',
+        ...message.user,
         name: 'AI Assistant',
-        email: null,
-        emailVerified: null,
         image: null,
-        createdAt: new Date(),
       };
     }
 

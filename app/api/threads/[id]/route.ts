@@ -33,7 +33,17 @@ export async function GET(
       return new NextResponse("Thread not found", { status: 404 });
     }
 
-    return NextResponse.json(thread);
+    // Modify AI messages to show proper user information
+    const messages = thread.messages.map(message => ({
+      ...message,
+      user: message.isAi ? {
+        ...message.user,
+        name: 'AI Assistant',
+        image: null,
+      } : message.user
+    }));
+
+    return NextResponse.json({ ...thread, messages });
   } catch (error) {
     console.error("[THREAD_GET]", error);
     return new NextResponse("Internal Error", { status: 500 });

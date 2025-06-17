@@ -10,6 +10,7 @@ type Message = {
   content: string;
   createdAt: Date;
   userId: string;
+  isAi: boolean;
   user: {
     name: string | null;
     image: string | null;
@@ -57,6 +58,7 @@ export default function ChatWindow() {
         body: JSON.stringify({
           content: message,
           threadId: currentThreadId,
+          isAi: false,
         }),
       });
 
@@ -84,6 +86,7 @@ export default function ChatWindow() {
         content: '',
         createdAt: new Date(),
         userId: 'ai',
+        isAi: true,
         user: {
           name: 'AI Assistant',
           image: null,
@@ -148,7 +151,7 @@ export default function ChatWindow() {
             className="flex gap-3 items-start"
           >
             <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold bg-zinc-700">
-              {msg.user.name?.[0] || 'U'}
+              {msg.isAi ? 'AI' : msg.user.name?.[0] || 'U'}
             </div>
             <div className="rounded-lg px-4 py-2 shadow text-sm max-w-xl bg-white">
               <ReactMarkdown>{msg.content}</ReactMarkdown>
