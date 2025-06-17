@@ -90,6 +90,17 @@ export default function ChatWindow() {
       setCurrentThreadId(thread.id);
       setPendingNewThread(false);
       setMessages(thread.messages);
+      // Emit event for new thread creation
+      window.dispatchEvent(new CustomEvent('newThreadCreated', { 
+        detail: { 
+          thread: {
+            id: thread.id,
+            title: title,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          }
+        } 
+      }));
       // Now, get AI response as normal
       await getAIResponse(message, model, thread.id);
     } catch (err) {

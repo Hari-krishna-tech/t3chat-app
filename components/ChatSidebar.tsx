@@ -16,7 +16,13 @@ export default function ChatSidebar() {
   const { data: session } = useSession();
   const router = useRouter();
   const [threads, setThreads] = useState<Thread[]>([]);
-  const [selectedThreadId, setSelectedThreadId] = useState<string | null>(null);
+  const [selectedThreadId, setSelectedThreadId] = useState<string | null>(() => {
+    // Initialize from localStorage if available
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('selectedThreadId');
+    }
+    return null;
+  });
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
@@ -35,8 +41,22 @@ export default function ChatSidebar() {
     fetchThreads();
   }, []);
 
+  useEffect(() => {
+    const handleNewThreadCreated = (event: CustomEvent<{ thread: Thread }>) => {
+      setThreads(prev => [event.detail.thread, ...prev]);
+      setSelectedThreadId(event.detail.thread.id);
+      localStorage.setItem('selectedThreadId', event.detail.thread.id);
+    };
+
+    window.addEventListener('newThreadCreated', handleNewThreadCreated as EventListener);
+    return () => {
+      window.removeEventListener('newThreadCreated', handleNewThreadCreated as EventListener);
+    };
+  }, []);
+
   const handleThreadSelect = (threadId: string) => {
     setSelectedThreadId(threadId);
+    localStorage.setItem('selectedThreadId', threadId);
     // Emit an event that the main chat window can listen to
     window.dispatchEvent(new CustomEvent("threadSelected", { detail: { threadId } }));
   };
