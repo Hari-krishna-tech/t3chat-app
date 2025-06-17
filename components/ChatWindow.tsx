@@ -244,10 +244,10 @@ export default function ChatWindow() {
             className={`flex ${msg.isAi ? 'justify-start' : 'justify-end'}`}
           >
             <div
-              className={`rounded-lg px-4 py-2 shadow text-sm max-w-xl
+              className={`rounded-lg px-4 py-2 shadow-none text-sm max-w-xl
                 ${msg.isAi
-                  ? 'bg-background-dark text-foreground'
-                  : 'bg-accent-purple/20 text-accent-purple'}
+                  ? 'text-foreground'
+                  : 'text-accent-purple'}
               `}
             >
               <ReactMarkdown>{msg.content}</ReactMarkdown>
