@@ -62,17 +62,17 @@ export default function ChatSidebar() {
   };
 
   return (
-    <aside className="flex flex-col h-full w-72 bg-zinc-900 text-white border-r border-zinc-800">
+    <aside className="flex flex-col h-full w-72 bg-background text-foreground border-r border-background-dark shadow-lg">
       {/* Header */}
-      <div className="p-4 border-b border-zinc-800">
-        <NewThreadButton className="w-full bg-zinc-800 hover:bg-zinc-700 text-white border-zinc-700" />
+      <div className="p-4 border-b border-background-dark">
+        <NewThreadButton className="w-full bg-accent-purple hover:bg-accent-dark text-white border-none shadow-md" />
       </div>
       {/* Search */}
-      <div className="p-4 border-b border-zinc-800">
+      <div className="p-4 border-b border-background-dark">
         <input
           type="text"
           placeholder="Search your threads..."
-          className="w-full px-3 py-2 rounded bg-zinc-800 text-white placeholder-zinc-400 focus:outline-none"
+          className="w-full px-3 py-2 rounded-lg bg-background-dark text-foreground placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-accent-purple transition"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
@@ -89,11 +89,13 @@ export default function ChatSidebar() {
             <li
               key={thread.id}
               onClick={() => handleThreadSelect(thread.id)}
-              className={`hover:bg-zinc-800 rounded px-3 py-2 cursor-pointer ${
-                selectedThreadId === thread.id ? "bg-zinc-800" : ""
-              }`}
+              className={`rounded-lg px-3 py-2 cursor-pointer transition-colors font-medium flex flex-col gap-0.5 shadow-sm
+                ${selectedThreadId === thread.id
+                  ? "bg-accent-purple/20 border-l-4 border-accent-purple text-accent-purple"
+                  : "hover:bg-background-dark hover:text-accent-purple/80"}
+              `}
             >
-              <div className="text-sm font-medium truncate">{thread.title}</div>
+              <div className="text-sm truncate">{thread.title}</div>
               <div className="text-xs text-zinc-400">
                 {new Date(thread.updatedAt).toLocaleDateString()}
               </div>
@@ -103,22 +105,22 @@ export default function ChatSidebar() {
       </div>
       {/* User Profile */}
       <div 
-        className="p-4 border-t border-zinc-800 flex items-center gap-3 cursor-pointer hover:bg-zinc-800"
+        className="p-4 border-t border-background-dark flex items-center gap-3 cursor-pointer hover:bg-background-dark transition rounded-b-lg"
         onClick={() => router.push('/settings')}
       >
         {session?.user?.image ? (
           <img
             src={session.user.image}
             alt={session.user.name || "User"}
-            className="w-8 h-8 rounded-full"
+            className="w-9 h-9 rounded-full border-2 border-accent-purple shadow"
           />
         ) : (
-          <div className="w-8 h-8 rounded-full bg-zinc-700 flex items-center justify-center text-sm font-bold">
+          <div className="w-9 h-9 rounded-full bg-accent-purple flex items-center justify-center text-lg font-bold text-white shadow">
             {session?.user?.name?.[0] || "U"}
           </div>
         )}
         <div>
-          <div className="text-sm font-semibold">{session?.user?.name || "User"}</div>
+          <div className="text-sm font-semibold text-foreground">{session?.user?.name || "User"}</div>
           <div className="text-xs text-zinc-400">{session?.user?.email || ""}</div>
         </div>
       </div>

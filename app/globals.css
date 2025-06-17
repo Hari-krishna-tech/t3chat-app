@@ -3,17 +3,18 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+  --foreground-rgb: 232, 230, 255;
+  --background-start-rgb: 24, 20, 36;
+  --background-end-rgb: 34, 28, 54;
+  --accent-purple: 139, 92, 246; /* Tailwind purple-500 */
+  --accent-purple-dark: 91, 33, 182; /* Tailwind purple-800 */
 }
 
 body {
   color: rgb(var(--foreground-rgb));
   background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+      120deg,
+      rgb(var(--background-start-rgb)) 0%,
+      rgb(var(--background-end-rgb)) 100%
+    );
 }
