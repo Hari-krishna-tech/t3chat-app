@@ -57,12 +57,31 @@ export default function ChatWindow() {
   const createThreadAndSendMessage = async (message: string, model: ModelType) => {
     try {
       setIsLoading(true);
-      // Create the thread
+      // 1. Generate a title using the LLM
+      const titlePrompt = `Suggest a short, relevant chat title for this message: "${message}". Respond with only the title, no punctuation or quotes.`;
+      const titleRes = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: titlePrompt, model }),
+      });
+      let title = 'New Chat';
+      if (titleRes.ok && titleRes.body) {
+        const reader = titleRes.body.getReader();
+        let titleText = '';
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          titleText += new TextDecoder().decode(value);
+        }
+        title = titleText.trim().replace(/^"|"$/g, '');
+        if (!title) title = 'New Chat';
+      }
+      // 2. Create the thread with the generated title
       const threadRes = await fetch('/api/threads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          title: message.substring(0, 30) || 'New Chat',
+          title,
           message,
         }),
       });
