@@ -100,11 +100,23 @@ export default function ChatWindow() {
   };
 
   const getAIResponse = async (message: string, model: ModelType, threadId: string) => {
-    // Then, get AI response
+    // Prepare context: all messages in the thread so far, including the new user message
+    const contextMessages = [
+      ...messages,
+      {
+        id: 'user-temp',
+        content: message,
+        createdAt: new Date(),
+        userId: 'user',
+        isAi: false,
+        user: { name: null, image: null },
+      },
+    ];
+    // Send the full thread as context
     const aiResponse = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message, model }),
+      body: JSON.stringify({ messages: contextMessages, model }),
     });
     if (!aiResponse.ok) {
       throw new Error('Failed to get AI response');
