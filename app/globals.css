@@ -3,11 +3,24 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 232, 230, 255;
-  --background-rgb: 18, 16, 24;
-  --background-dark-rgb: 24, 20, 36;
-  --accent-purple: 139, 92, 246; /* Tailwind purple-500 */
-  --accent-purple-dark: 91, 33, 182; /* Tailwind purple-800 */
+  /* Neutrals */
+  --foreground-rgb: 236, 239, 244;       /* #ECF0F4 – light gray for text */
+  --background-rgb: 15, 23, 42;         /* #0F172A – deep navy */
+  --background-dark-rgb: 10, 13, 23;    /* #0A0D17 – near‑black */
+
+  /* Primary Accent */
+  --accent-primary-rgb: 79, 70, 229;    /* #4F46E5 – indigo-600 */
+  --accent-primary-dark-rgb: 67, 56, 202; /* #4338CA – indigo-700 */
+
+  /* Secondary Accent */
+  --accent-secondary-rgb: 16, 185, 129; /* #10B981 – emerald-500 */
+  --accent-secondary-dark-rgb: 5, 150, 105; /* #059669 – emerald-600 */
+
+  /* Semantic / Feedback Colors */
+  --accent-success-rgb: 34, 197, 94;    /* #22C55E – green-500 */
+  --accent-warning-rgb: 234, 179, 8;    /* #EAB308 – amber-500 */
+  --accent-error-rgb: 239, 68, 68;      /* #EF4444 – red-500 */
+  --accent-info-rgb: 56, 189, 248;      /* #38BDF8 – sky-400 */
 }
 
 html, body {
@@ -32,7 +45,7 @@ body, #__next, #root {
 }
 
 ::selection {
-  background: rgba(var(--accent-purple), 0.3);
+  background: rgba(var(--accent-primary-rgb), 0.3);
 }
 
 input, textarea, select, button {
@@ -45,12 +58,12 @@ input, textarea, select, button {
   color: rgb(var(--foreground-rgb));
 }
 .markdown a, .prose a {
-  color: rgb(var(--accent-purple));
+  color: rgb(var(--accent-primary-rgb));
   text-decoration: underline;
 }
 .markdown code, .prose code {
   background: rgb(var(--background-dark-rgb));
-  color: rgb(var(--accent-purple));
+  color: rgb(var(--accent-primary-rgb));
   padding: 0.2em 0.4em;
   border-radius: 4px;
   font-size: 0.95em;
@@ -69,6 +82,6 @@ input, textarea, select, button {
   background: rgb(var(--background-dark-rgb));
 }
 ::-webkit-scrollbar-thumb {
-  background: rgb(var(--accent-purple-dark));
+  background: rgb(var(--accent-primary-dark-rgb));
   border-radius: 8px;
 }

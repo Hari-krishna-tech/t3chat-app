@@ -25,11 +25,11 @@ export default function SettingsPage() {
         <div className="flex items-center gap-4 mb-8">
           <button
             onClick={() => router.push("/")}
-            className="px-4 py-2 bg-accent-purple hover:bg-accent-dark text-white rounded-lg font-semibold shadow transition-colors"
+            className="px-4 py-2 bg-accent-primary hover:bg-accent-primary-dark text-white rounded-lg font-semibold shadow transition-colors"
           >
             ← Back
           </button>
-          <h1 className="text-3xl font-bold text-accent-purple">Settings</h1>
+          <h1 className="text-3xl font-bold text-accent-primary">Settings</h1>
         </div>
 
         {/* User Settings Section */}
@@ -41,10 +41,10 @@ export default function SettingsPage() {
                 <img
                   src={session.user.image}
                   alt={session.user.name || "User"}
-                  className="w-16 h-16 rounded-full border-2 border-accent-purple shadow"
+                  className="w-16 h-16 rounded-full border-2 border-accent-primary shadow"
                 />
               ) : (
-                <div className="w-16 h-16 rounded-full bg-accent-purple flex items-center justify-center text-2xl font-bold text-white shadow">
+                <div className="w-16 h-16 rounded-full bg-accent-primary flex items-center justify-center text-2xl font-bold text-white shadow">
                   {session?.user?.name?.[0] || "U"}
                 </div>
               )}
@@ -64,7 +64,7 @@ export default function SettingsPage() {
               <div className="font-medium">Total Request Limit</div>
               <div className="text-sm text-zinc-400">Maximum requests allowed</div>
             </div>
-            <div className="text-lg font-semibold text-accent-purple">1500</div>
+            <div className="text-lg font-semibold text-accent-primary">1500</div>
           </div>
         </section>
 
@@ -75,7 +75,7 @@ export default function SettingsPage() {
             {MODELS.map((model) => (
               <li key={model.id} className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 bg-background rounded-lg p-4">
                 <div>
-                  <div className="font-medium text-accent-purple">{model.name}</div>
+                  <div className="font-medium text-accent-primary">{model.name}</div>
                   <div className="text-sm text-zinc-400">{model.description}</div>
                   <div className="text-xs text-zinc-500 mt-1">Provider: {model.provider}, Max Tokens: {model.maxTokens.toLocaleString()}</div>
                 </div>

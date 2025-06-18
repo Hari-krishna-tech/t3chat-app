@@ -29,7 +29,7 @@ export default function ModelSelect({ selectedModel, onModelChange }: ModelSelec
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-2 text-sm bg-background-dark hover:bg-accent-purple/20 text-foreground rounded-lg transition-colors border border-background-dark shadow"
+        className="flex items-center gap-2 px-3 py-2 text-sm bg-background-dark hover:bg-accent-primary/20 text-foreground rounded-lg transition-colors border border-background-dark shadow"
       >
         <span>{selectedModelConfig?.name}</span>
         <svg
@@ -43,7 +43,7 @@ export default function ModelSelect({ selectedModel, onModelChange }: ModelSelec
       </button>
 
       {isOpen && (
-        <div className="absolute bottom-full mb-2 w-64 bg-background-dark rounded-lg shadow-lg border border-accent-purple z-50">
+        <div className="absolute bottom-full mb-2 w-64 bg-background-dark rounded-lg shadow-lg border border-accent-primary z-50">
           <div className="py-1">
             {MODELS.map((model) => (
               <button
@@ -53,7 +53,7 @@ export default function ModelSelect({ selectedModel, onModelChange }: ModelSelec
                   setIsOpen(false);
                 }}
                 className={`w-full px-4 py-2 text-left text-sm transition-colors rounded-lg
-                  ${model.id === selectedModel ? "bg-accent-purple/30 text-accent-purple font-bold" : "hover:bg-accent-purple/10 hover:text-accent-purple"}
+                  ${model.id === selectedModel ? "bg-accent-primary/30 text-accent-primary font-bold" : "hover:bg-accent-primary/10 hover:text-accent-primary"}
                 `}
               >
                 <div className="font-medium">{model.name}</div>

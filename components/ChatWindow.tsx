@@ -230,8 +230,8 @@ export default function ChatWindow() {
     <section className="flex flex-col flex-1 h-full bg-background">
       {/* Header */}
       <header className="px-6 py-4 border-b border-background-dark bg-background-dark/90 backdrop-blur flex items-center justify-between">
-        <h1 className="text-lg font-bold text-accent-purple">T3.chat</h1>
-        <NewThreadButton className="px-3 py-1 bg-accent-purple hover:bg-accent-dark text-white border-none shadow" />
+        <h1 className="text-lg font-bold text-accent-primary">T3.chat</h1>
+        <NewThreadButton className="px-3 py-1 bg-accent-primary hover:bg-accent-primary-dark text-white border-none shadow" />
       </header>
       {/* Chat messages */}
       <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4 bg-background">
@@ -247,7 +247,7 @@ export default function ChatWindow() {
               className={`rounded-lg px-4 py-2 shadow-none text-sm max-w-xl
                 ${msg.isAi
                   ? 'text-foreground'
-                  : 'text-accent-purple'}
+                  : 'text-accent-primary'}
               `}
             >
               <ReactMarkdown>{msg.content}</ReactMarkdown>

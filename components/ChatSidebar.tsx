@@ -65,14 +65,14 @@ export default function ChatSidebar() {
     <aside className="flex flex-col h-full w-72 bg-background text-foreground border-r border-background-dark shadow-lg">
       {/* Header */}
       <div className="p-4 border-b border-background-dark">
-        <NewThreadButton className="w-full bg-accent-purple hover:bg-accent-dark text-white border-none shadow-md" />
+        <NewThreadButton className="w-full bg-accent-primary hover:bg-accent-primary-dark text-white border-none shadow-md" />
       </div>
       {/* Search */}
       <div className="p-4 border-b border-background-dark">
         <input
           type="text"
           placeholder="Search your threads..."
-          className="w-full px-3 py-2 rounded-lg bg-background-dark text-foreground placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-accent-purple transition"
+          className="w-full px-3 py-2 rounded-lg bg-background-dark text-foreground placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-accent-primary transition"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
@@ -91,8 +91,8 @@ export default function ChatSidebar() {
               onClick={() => handleThreadSelect(thread.id)}
               className={`rounded-lg px-3 py-2 cursor-pointer transition-colors font-medium flex flex-col gap-0.5 shadow-sm
                 ${selectedThreadId === thread.id
-                  ? "bg-accent-purple/20 border-l-4 border-accent-purple text-accent-purple"
-                  : "hover:bg-background-dark hover:text-accent-purple/80"}
+                  ? "bg-accent-primary/20 border-l-4 border-accent-primary text-accent-primary"
+                  : "hover:bg-background-dark hover:text-accent-primary/80"}
               `}
             >
               <div className="text-sm truncate">{thread.title}</div>
@@ -112,10 +112,10 @@ export default function ChatSidebar() {
           <img
             src={session.user.image}
             alt={session.user.name || "User"}
-            className="w-9 h-9 rounded-full border-2 border-accent-purple shadow"
+            className="w-9 h-9 rounded-full border-2 border-accent-primary shadow"
           />
         ) : (
-          <div className="w-9 h-9 rounded-full bg-accent-purple flex items-center justify-center text-lg font-bold text-white shadow">
+          <div className="w-9 h-9 rounded-full bg-accent-primary flex items-center justify-center text-lg font-bold text-white shadow">
             {session?.user?.name?.[0] || "U"}
           </div>
         )}

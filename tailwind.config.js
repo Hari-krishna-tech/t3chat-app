@@ -12,15 +12,21 @@ module.exports = {
       },
       colors: {
         background: {
-          DEFAULT: '#181424',
-          dark: '#221C36',
+          DEFAULT: 'rgb(var(--background-rgb))',
+          dark: 'rgb(var(--background-dark-rgb))',
         },
         foreground: {
-          DEFAULT: '#E8E6FF',
+          DEFAULT: 'rgb(var(--foreground-rgb))',
         },
         accent: {
-          purple: '#8B5CF6',
-          dark: '#5B21B6',
+          primary: 'rgb(var(--accent-primary-rgb))',
+          'primary-dark': 'rgb(var(--accent-primary-dark-rgb))',
+          secondary: 'rgb(var(--accent-secondary-rgb))',
+          'secondary-dark': 'rgb(var(--accent-secondary-dark-rgb))',
+          success: 'rgb(var(--accent-success-rgb))',
+          warning: 'rgb(var(--accent-warning-rgb))',
+          error: 'rgb(var(--accent-error-rgb))',
+          info: 'rgb(var(--accent-info-rgb))',
         },
       },
     },

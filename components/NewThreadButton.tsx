@@ -18,7 +18,7 @@ export function NewThreadButton({ className = "" }: NewThreadButtonProps) {
     <button
       onClick={startNewChat}
       disabled={isCreating}
-      className={`flex items-center gap-2 rounded-lg border-none p-3 text-sm font-semibold transition-all bg-gradient-to-br from-accent-purple to-accent-dark text-white shadow-md hover:from-accent-dark hover:to-accent-purple focus:outline-none focus:ring-2 focus:ring-accent-purple disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
+      className={`flex items-center gap-2 rounded-lg border-none p-3 text-sm font-semibold transition-all bg-gradient-to-br from-accent-primary to-accent-primary-dark text-white shadow-md hover:from-accent-primary-dark hover:to-accent-primary focus:outline-none focus:ring-2 focus:ring-accent-primary disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
