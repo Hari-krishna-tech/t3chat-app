@@ -17,7 +17,7 @@ type Message = {
   };
 };
 
-export default function ChatWindow() {
+export default function ChatWindow({ onSidebarToggle }: { onSidebarToggle: () => void }) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [currentThreadId, setCurrentThreadId] = useState<string | null>(() => {
@@ -230,7 +230,19 @@ export default function ChatWindow() {
     <section className="flex flex-col flex-1 h-full bg-background">
       {/* Header */}
       <header className="px-6 py-4 border-b border-background-dark bg-background-dark/90 backdrop-blur flex items-center justify-between">
-        <h1 className="text-lg font-bold text-accent-primary">T3.chat</h1>
+        <div className="flex items-center gap-2">
+          {/* Hamburger menu for mobile */}
+          <button
+            className="md:hidden mr-2 p-2 rounded bg-background-dark text-foreground hover:bg-background"
+            onClick={onSidebarToggle}
+            aria-label="Open sidebar"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5" />
+            </svg>
+          </button>
+          <h1 className="text-lg font-bold text-accent-primary">T3.chat</h1>
+        </div>
         <NewThreadButton className="px-3 py-1 bg-accent-primary hover:bg-accent-primary-dark text-white border-none shadow" />
       </header>
       {/* Chat messages */}
