@@ -4,13 +4,13 @@
 
 :root {
   /* Neutrals */
-  --foreground-rgb: 175, 175, 175;       /* #ECF0F4 – light gray for text */
-  --background-rgb: 58, 58, 58;         /* #0F172A – deep navy */
-  --background-dark-rgb: 31, 31, 31;    /* #0A0D17 – near‑black */
+  --foreground-rgb: 249, 249, 249;       /* #ECF0F4 – light gray for text */
+  --background-rgb: 22, 33, 62;         /* #0F172A – deep navy */
+  --background-dark-rgb: 26, 26, 46;    /* #0A0D17 – near‑black */
 
   /* Primary Accent */
-  --accent-primary-rgb: 127, 127, 127;    /* #4F46E5 – indigo-600 */
-  --accent-primary-dark-rgb: 92,92,92;/* #4338CA – indigo-700 */
+  --accent-primary-rgb: 233, 70, 96;    /* #4F46E5 – indigo-600 */
+  --accent-primary-dark-rgb: 15, 52, 96;/* #4338CA – indigo-700 */
 
   /* Secondary Accent */
   --accent-secondary-rgb: 16, 185, 129; /* #10B981 – emerald-500 */
