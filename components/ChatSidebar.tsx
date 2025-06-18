@@ -64,8 +64,9 @@ export default function ChatSidebar({ collapsed = false, onToggle = () => {} }: 
 
   return (
     <aside className={`flex flex-col h-full ${collapsed ? 'w-12' : 'w-72'} bg-background text-foreground border-r border-background-dark shadow-lg transition-all duration-200 z-30`}>
-      {/* Header with toggle and title */}
-      <div className="flex items-center gap-2 p-4 border-b border-background-dark justify-center">
+      {/* Header with logo left and toggle right */}
+      <div className={`flex items-center p-4 border-b border-background-dark ${collapsed ? 'justify-center' : 'justify-between'}`}>
+        {!collapsed && <span className="text-lg font-bold text-accent-primary">T3.chat</span>}
         <button
           className="p-2 rounded bg-background-dark text-foreground hover:bg-background"
           onClick={onToggle}
@@ -83,7 +84,6 @@ export default function ChatSidebar({ collapsed = false, onToggle = () => {} }: 
             </svg>
           )}
         </button>
-        {!collapsed && <span className="text-lg font-bold text-accent-primary">T3.chat</span>}
       </div>
       {/* Sidebar content */}
       {!collapsed && (
