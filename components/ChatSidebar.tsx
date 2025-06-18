@@ -64,19 +64,18 @@ export default function ChatSidebar({ isOpen = true, onClose = () => {} }: { isO
 
   return (
     <aside className={`flex flex-col h-full w-72 bg-background text-foreground border-r border-background-dark shadow-lg transition-transform duration-200 z-30 fixed md:static top-0 left-0 ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
-      {/* Close button for mobile */}
-      <button
-        className="md:hidden absolute top-4 right-4 z-40 bg-background-dark text-foreground rounded-full p-2 shadow hover:bg-background"
-        onClick={onClose}
-        aria-label="Close sidebar"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
-      {/* Header */}
-      <div className="p-4 border-b border-background-dark">
-        <NewThreadButton className="w-full bg-accent-primary hover:bg-accent-primary-dark text-white border-none shadow-md" />
+      {/* Header with toggle and title */}
+      <div className="flex items-center gap-2 p-4 border-b border-background-dark">
+        <button
+          className="mr-2 p-2 rounded bg-background-dark text-foreground hover:bg-background"
+          onClick={onClose}
+          aria-label="Toggle sidebar"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5" />
+          </svg>
+        </button>
+        <span className="text-lg font-bold text-accent-primary">T3.chat</span>
       </div>
       {/* Search */}
       <div className="p-4 border-b border-background-dark">
