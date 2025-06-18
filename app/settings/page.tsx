@@ -28,9 +28,12 @@ export default function SettingsPage() {
         <div className="flex items-center gap-4 mb-8">
           <button
             onClick={() => router.push("/")}
-            className="px-4 py-2 bg-accent-primary hover:bg-accent-primary-dark text-white rounded-lg font-semibold shadow transition-colors"
+            className="flex items-center gap-2 px-5 py-2.5 bg-accent-primary hover:bg-accent-primary-dark text-white rounded-lg font-semibold shadow-lg transition-all duration-200 hover:scale-105 hover:shadow-xl"
           >
-            ← Back
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+            </svg>
+            Back
           </button>
           <h1 className="text-3xl font-bold text-accent-primary">Settings</h1>
         </div>
