@@ -2,7 +2,7 @@
 
 import { Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
-import { ThemeProvider } from "@/context/ThemeContext";
+import { ThemeProvider } from "@/app/context/ThemeContext";
 
 export default function Providers({ 
   children,
