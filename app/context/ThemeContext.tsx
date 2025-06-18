@@ -11,24 +11,30 @@ type ThemeContextType = {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  // Initialize with default theme
   const [currentTheme, setCurrentTheme] = useState<Theme>(themes[0]);
 
+  // Load saved theme on mount
   useEffect(() => {
-    // Load saved theme from localStorage
-    const savedTheme = localStorage.getItem("theme");
-    if (savedTheme) {
-      const theme = themes.find((t) => t.name === savedTheme);
-      if (theme) {
-        setCurrentTheme(theme);
+    try {
+      const savedThemeName = localStorage.getItem("theme");
+      if (savedThemeName) {
+        const savedTheme = themes.find((t) => t.name === savedThemeName);
+        if (savedTheme) {
+          setCurrentTheme(savedTheme);
+          applyTheme(savedTheme);
+        }
+      } else {
+        // If no saved theme, save the default theme
+        localStorage.setItem("theme", themes[0].name);
+        applyTheme(themes[0]);
       }
+    } catch (error) {
+      console.error("Error loading theme from localStorage:", error);
     }
   }, []);
 
-  const setTheme = (theme: Theme) => {
-    setCurrentTheme(theme);
-    localStorage.setItem("theme", theme.name);
-    
-    // Update CSS variables
+  const applyTheme = (theme: Theme) => {
     document.documentElement.style.setProperty("--foreground-rgb", theme.colors.foreground);
     document.documentElement.style.setProperty("--background-rgb", theme.colors.background);
     document.documentElement.style.setProperty("--background-dark-rgb", theme.colors.backgroundDark);
@@ -37,10 +43,18 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     document.documentElement.style.setProperty("--accent-secondary-rgb", theme.colors.accentSecondary);
   };
 
-  // Apply theme on mount and theme change
-  useEffect(() => {
-    setTheme(currentTheme);
-  }, [currentTheme]);
+  const setTheme = (theme: Theme) => {
+    try {
+      // Save to localStorage
+      localStorage.setItem("theme", theme.name);
+      // Update state
+      setCurrentTheme(theme);
+      // Apply theme
+      applyTheme(theme);
+    } catch (error) {
+      console.error("Error saving theme to localStorage:", error);
+    }
+  };
 
   return (
     <ThemeContext.Provider value={{ currentTheme, setTheme }}>
