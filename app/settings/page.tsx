@@ -4,10 +4,13 @@ import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { MODELS } from "@/lib/models";
+import { useTheme } from "@/context/ThemeContext";
+import { themes } from "@/lib/themes";
 
 export default function SettingsPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const { currentTheme, setTheme } = useTheme();
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -31,6 +34,54 @@ export default function SettingsPage() {
           </button>
           <h1 className="text-3xl font-bold text-accent-primary">Settings</h1>
         </div>
+
+        {/* Theme Settings Section */}
+        <section className="bg-background-dark rounded-lg p-6 shadow">
+          <h2 className="text-xl font-semibold mb-4">Theme Settings</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {themes.map((theme) => (
+              <button
+                key={theme.name}
+                onClick={() => setTheme(theme)}
+                className={`p-4 rounded-lg border-2 transition-all ${
+                  currentTheme.name === theme.name
+                    ? "border-accent-primary bg-accent-primary/10"
+                    : "border-background hover:border-accent-primary/50"
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <div
+                    className="w-8 h-8 rounded-full"
+                    style={{
+                      background: `rgb(${theme.colors.accentPrimary})`,
+                    }}
+                  />
+                  <span className="font-medium">{theme.name}</span>
+                </div>
+                <div className="mt-2 flex gap-1">
+                  <div
+                    className="w-4 h-4 rounded"
+                    style={{
+                      background: `rgb(${theme.colors.background})`,
+                    }}
+                  />
+                  <div
+                    className="w-4 h-4 rounded"
+                    style={{
+                      background: `rgb(${theme.colors.backgroundDark})`,
+                    }}
+                  />
+                  <div
+                    className="w-4 h-4 rounded"
+                    style={{
+                      background: `rgb(${theme.colors.accentPrimary})`,
+                    }}
+                  />
+                </div>
+              </button>
+            ))}
+          </div>
+        </section>
 
         {/* User Settings Section */}
         <section className="bg-background-dark rounded-lg p-6 shadow">
