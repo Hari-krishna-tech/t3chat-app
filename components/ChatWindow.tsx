@@ -17,27 +17,21 @@ type Message = {
   };
 };
 
-interface ChatWindowProps {
-  onSidebarToggle: () => void;
-  incognito?: boolean;
-}
-
-export default function ChatWindow({ onSidebarToggle, incognito = false }: ChatWindowProps) {
+export default function ChatWindow({ onSidebarToggle }: { onSidebarToggle: () => void }) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [currentThreadId, setCurrentThreadId] = useState<string | null>(() => {
-    if (typeof window !== 'undefined' && !incognito) {
+    if (typeof window !== 'undefined') {
       return localStorage.getItem('selectedThreadId');
     }
     return null;
   });
   const [pendingNewThread, setPendingNewThread] = useState(() => {
-    if (typeof window !== 'undefined' && !incognito) {
+    if (typeof window !== 'undefined') {
       return !localStorage.getItem('selectedThreadId');
     }
     return true;
   });
-  const [incognitoTitle, setIncognitoTitle] = useState<string>("");
 
   useEffect(() => {
     const handleThreadSelect = (event: CustomEvent<{ threadId: string }>) => {
@@ -50,19 +44,11 @@ export default function ChatWindow({ onSidebarToggle, incognito = false }: ChatW
       setMessages([]);
       setPendingNewThread(true);
     };
-    const handleNewIncognito = () => {
-      setCurrentThreadId('incognito-' + Date.now());
-      setMessages([]);
-      setPendingNewThread(true);
-      setIncognitoTitle('Incognito Chat ' + Math.floor(Math.random() * 10000));
-    };
     window.addEventListener('threadSelected', handleThreadSelect as EventListener);
     window.addEventListener('newChatStarted', handleNewChatStarted);
-    window.addEventListener('newIncognitoChatStarted', handleNewIncognito);
     return () => {
       window.removeEventListener('threadSelected', handleThreadSelect as EventListener);
       window.removeEventListener('newChatStarted', handleNewChatStarted);
-      window.removeEventListener('newIncognitoChatStarted', handleNewIncognito);
     };
   }, []);
 
@@ -74,7 +60,6 @@ export default function ChatWindow({ onSidebarToggle, incognito = false }: ChatW
   }, [currentThreadId, pendingNewThread]);
 
   const fetchThreadMessages = async (threadId: string) => {
-    if (incognito) return; // No-op in incognito
     try {
       const response = await fetch(`/api/threads/${threadId}`);
       if (response.ok) {
@@ -87,27 +72,6 @@ export default function ChatWindow({ onSidebarToggle, incognito = false }: ChatW
   };
 
   const createThreadAndSendMessage = async (message: string, model: ModelType) => {
-    if (incognito) {
-      setIsLoading(true);
-      // Generate a local title
-      const title = 'Incognito Chat ' + Math.floor(Math.random() * 10000);
-      setIncognitoTitle(title);
-      setCurrentThreadId('incognito-' + Date.now());
-      setPendingNewThread(false);
-      const userMessage: Message = {
-        id: 'user-' + Date.now(),
-        content: message,
-        createdAt: new Date(),
-        userId: 'user',
-        isAi: false,
-        user: { name: null, image: null },
-      };
-      setMessages([userMessage]);
-      // Simulate AI response
-      await getAIResponse(message, model, 'incognito');
-      setIsLoading(false);
-      return;
-    }
     try {
       setIsLoading(true);
       // 1. Generate a title using the LLM
@@ -164,27 +128,6 @@ export default function ChatWindow({ onSidebarToggle, incognito = false }: ChatW
   };
 
   const getAIResponse = async (message: string, model: ModelType, threadId: string) => {
-    if (incognito) {
-      // Simulate AI response locally (could call a local LLM or just echo for demo)
-      const tempAiMessage: Message = {
-        id: 'temp-' + Date.now(),
-        content: '',
-        createdAt: new Date(),
-        userId: 'ai',
-        isAi: true,
-        user: { name: 'AI Assistant', image: null },
-      };
-      setMessages((prev) => [...prev, tempAiMessage]);
-      // For demo, just echo the user message after a delay
-      setTimeout(() => {
-        setMessages((prev) =>
-          prev.map((m) =>
-            m.id === tempAiMessage.id ? { ...m, content: 'Echo: ' + message } : m
-          )
-        );
-      }, 800);
-      return;
-    }
     // Prepare context: all messages in the thread so far, including the new user message
     const contextMessages = [
       ...messages,
@@ -253,24 +196,6 @@ export default function ChatWindow({ onSidebarToggle, incognito = false }: ChatW
   };
 
   const onSendMessage = async (message: string, model: ModelType) => {
-    if (incognito) {
-      if (pendingNewThread) {
-        await createThreadAndSendMessage(message, model);
-        return;
-      }
-      // Add user message
-      const userMessage: Message = {
-        id: 'user-' + Date.now(),
-        content: message,
-        createdAt: new Date(),
-        userId: 'user',
-        isAi: false,
-        user: { name: null, image: null },
-      };
-      setMessages((prev) => [...prev, userMessage]);
-      await getAIResponse(message, model, 'incognito');
-      return;
-    }
     if (pendingNewThread) {
       await createThreadAndSendMessage(message, model);
       return;
@@ -305,16 +230,8 @@ export default function ChatWindow({ onSidebarToggle, incognito = false }: ChatW
     <section className="flex flex-col flex-1 h-full bg-background">
       {/* Header */}
       <header className="px-6 py-4 border-b border-background-dark bg-background-dark/90 backdrop-blur flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <h1 className="text-lg font-bold text-accent-primary hidden">T3.chat</h1>
-          {incognito && (
-            <span className="ml-2 px-3 py-1 rounded bg-yellow-500 text-black font-semibold animate-pulse">Incognito</span>
-          )}
-          {incognito && (
-            <span className="ml-2 text-zinc-300 font-semibold">{incognitoTitle}</span>
-          )}
-        </div>
-        {!incognito && <NewThreadButton className="px-3 py-1 bg-accent-primary hover:bg-accent-primary-dark text-white border-none shadow" />}
+        <h1 className="text-lg font-bold text-accent-primary hidden">T3.chat</h1>
+        <NewThreadButton className="px-3 py-1 bg-accent-primary hover:bg-accent-primary-dark text-white border-none shadow" />
       </header>
       {/* Chat messages */}
       <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4 bg-background">
