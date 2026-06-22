@@ -48,7 +48,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-transparent text-foreground overflow-y-auto px-4 py-8 sm:px-6 lg:px-8">
+    <div className="h-screen bg-transparent text-foreground overflow-y-auto px-4 py-8 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto space-y-8 pb-12 animate-fade-in">
         
         {/* Header navigation bar */}
