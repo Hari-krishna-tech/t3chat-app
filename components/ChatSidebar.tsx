@@ -80,9 +80,9 @@ export default function ChatSidebar({ collapsed = false, onToggle = () => {} }: 
       <div className={`flex items-center p-4 border-b border-white/[0.06] h-16 ${collapsed ? 'justify-center' : 'justify-between'}`}>
         {!collapsed && (
           <div className="flex items-center gap-2 cursor-pointer" onClick={() => router.push('/')}>
-            <span className="text-base font-bold tracking-tight gradient-text">
-              T3.chat
-            </span>
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent-primary/15 text-accent-primary font-black text-sm">
+              T3
+            </div>
           </div>
         )}
         <button
