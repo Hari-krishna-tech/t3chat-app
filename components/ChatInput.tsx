@@ -45,9 +45,9 @@ export default function ChatInput({ onSendMessage, isLoading }: ChatInputProps) 
   };
 
   return (
-    <div className="p-4 bg-gradient-to-t from-background via-background/95 to-transparent border-t border-foreground/[0.03]">
+    <div className="px-4 pb-5 pt-3 bg-gradient-to-t from-surface-0 via-surface-0/80 to-transparent">
       <form onSubmit={handleSubmit} className="max-w-3xl mx-auto relative">
-        <div className="relative flex items-end gap-2 p-2 pr-3 pl-4 rounded-2xl bg-foreground/[0.02] border border-foreground/10 focus-within:border-accent-primary/40 focus-within:ring-2 focus-within:ring-accent-primary/10 transition-all duration-300 backdrop-blur-md shadow-lg">
+        <div className="bg-surface-2/50 border border-white/[0.08] rounded-2xl p-2 pr-2.5 pl-4 flex items-end gap-2 focus-within:border-accent-primary/30 focus-within:ring-1 focus-within:ring-accent-primary/15 transition-all duration-300 shadow-lg shadow-black/20">
           <textarea
             ref={textareaRef}
             value={message}
@@ -56,14 +56,14 @@ export default function ChatInput({ onSendMessage, isLoading }: ChatInputProps) 
             onKeyDown={handleKeyDown}
             placeholder="Ask anything..."
             rows={1}
-            className="flex-1 max-h-[180px] min-h-[24px] py-1 bg-transparent text-foreground placeholder-zinc-500 border-none outline-none resize-none text-sm focus:ring-0 leading-relaxed font-sans scrollbar-none"
+            className="flex-1 max-h-[180px] min-h-[24px] py-1 bg-transparent text-zinc-100 placeholder-zinc-600 border-none outline-none resize-none text-sm focus:ring-0 leading-relaxed font-sans scrollbar-none"
             style={{ height: "auto" }}
           />
 
           <button
             type="submit"
             disabled={!message.trim() || isLoading}
-            className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent-primary text-white shadow-md shadow-accent-primary/10 hover:shadow-lg hover:shadow-accent-primary/20 hover:brightness-110 active:scale-95 transition-all duration-200 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed shrink-0"
+            className="flex h-8 w-8 items-center justify-center rounded-xl bg-accent-primary text-white hover:brightness-110 active:scale-95 transition-all duration-200 cursor-pointer disabled:opacity-20 disabled:cursor-not-allowed shrink-0 shadow-sm shadow-accent-primary/20"
             aria-label="Send message"
           >
             {isLoading ? (
@@ -80,7 +80,7 @@ export default function ChatInput({ onSendMessage, isLoading }: ChatInputProps) 
             )}
           </button>
         </div>
-        <div className="text-[10px] text-zinc-500 text-center mt-2 font-medium">
+        <div className="text-[10px] text-zinc-700 text-center mt-2">
           T3.chat can make mistakes. Please check important info.
         </div>
       </form>

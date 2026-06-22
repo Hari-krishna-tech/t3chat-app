@@ -20,7 +20,7 @@ export default function SettingsPage() {
 
   if (status === "loading") {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-background text-foreground gap-3">
+      <div className="flex flex-col items-center justify-center min-h-screen bg-transparent text-foreground gap-3">
         <div className="w-8 h-8 border-3 border-accent-primary border-t-transparent rounded-full animate-spin" />
         <span className="text-sm text-zinc-500 font-medium">Loading settings...</span>
       </div>
@@ -29,10 +29,10 @@ export default function SettingsPage() {
 
   const getProviderColor = (provider: string) => {
     switch (provider) {
-      case 'google': return 'bg-blue-500 text-blue-100 border-blue-500/10';
-      case 'openai': return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
-      case 'anthropic': return 'bg-amber-500/10 text-amber-400 border-amber-500/20';
-      case 'qwen': return 'bg-purple-500/10 text-purple-400 border-purple-500/20';
+      case 'google': return 'bg-blue-500/10 text-blue-400 border-blue-500/15';
+      case 'openai': return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/15';
+      case 'anthropic': return 'bg-amber-500/10 text-amber-400 border-amber-500/15';
+      case 'qwen': return 'bg-purple-500/10 text-purple-400 border-purple-500/15';
       default: return 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20';
     }
   };
@@ -48,15 +48,15 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground overflow-y-auto px-4 py-8 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto space-y-8 pb-12">
+    <div className="min-h-screen bg-transparent text-foreground overflow-y-auto px-4 py-8 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto space-y-8 pb-12 animate-fade-in">
         
         {/* Header navigation bar */}
-        <div className="flex items-center justify-between pb-6 border-b border-foreground/[0.04]">
+        <div className="flex items-center justify-between pb-6 border-b border-white/[0.04]">
           <div className="flex items-center gap-4">
             <button
               onClick={() => router.push("/")}
-              className="flex items-center justify-center h-10 w-10 bg-foreground/[0.02] border border-foreground/10 hover:bg-foreground/[0.06] text-zinc-300 hover:text-foreground rounded-xl transition-all cursor-pointer active:scale-95 shadow-sm"
+              className="flex items-center justify-center bg-white/[0.04] border border-white/[0.06] hover:bg-white/[0.07] text-zinc-400 hover:text-zinc-200 rounded-xl h-10 w-10 transition-all cursor-pointer active:scale-95"
               title="Go Back"
             >
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">
@@ -64,14 +64,14 @@ export default function SettingsPage() {
               </svg>
             </button>
             <div>
-              <h1 className="text-2xl font-extrabold tracking-tight">Settings</h1>
-              <p className="text-xs text-zinc-500 font-medium">Manage your workspace configuration and preferences</p>
+              <h1 className="text-xl font-bold tracking-tight text-zinc-100">Settings</h1>
+              <p className="text-xs text-zinc-500">Manage your workspace configuration and preferences</p>
             </div>
           </div>
 
           <button
             onClick={() => signOut()}
-            className="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/30 text-red-400 rounded-xl text-xs font-semibold transition-all active:scale-95 cursor-pointer"
+            className="bg-red-500/[0.08] border border-red-500/15 text-red-400 hover:bg-red-500/[0.15] hover:border-red-500/25 rounded-lg px-4 py-2 text-xs font-medium transition-all active:scale-95 cursor-pointer"
           >
             Sign Out
           </button>
@@ -81,14 +81,14 @@ export default function SettingsPage() {
         <div className="grid grid-cols-1 gap-6">
           
           {/* User Profile Section */}
-          <section className="glass-panel rounded-2xl p-6 shadow-md border border-foreground/[0.06] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <section className="bg-surface-1/60 backdrop-blur-xl rounded-2xl p-6 border border-white/[0.06] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-4">
               <div className="relative shrink-0">
                 {session?.user?.image ? (
                   <img
                     src={session.user.image}
                     alt={session.user.name || "User"}
-                    className="w-16 h-16 rounded-2xl border border-foreground/10 object-cover shadow-sm"
+                    className="w-16 h-16 rounded-2xl border border-white/[0.08] object-cover shadow-sm"
                   />
                 ) : (
                   <div className="w-16 h-16 rounded-2xl bg-accent-primary flex items-center justify-center text-2xl font-bold text-white shadow-sm shadow-accent-primary/20">
@@ -98,29 +98,29 @@ export default function SettingsPage() {
                 <div className="absolute -bottom-1 -right-1 w-4.5 h-4.5 bg-green-500 border-2 border-background-dark rounded-full" />
               </div>
               <div className="min-w-0">
-                <div className="text-lg font-bold text-foreground truncate">{session?.user?.name || "User Workspace"}</div>
-                <div className="text-xs text-zinc-400 truncate">{session?.user?.email}</div>
-                <div className="text-[9px] bg-foreground/[0.05] border border-foreground/[0.08] px-2 py-0.5 rounded-full inline-block text-zinc-400 font-semibold mt-2.5">
+                <div className="text-lg font-semibold text-zinc-100 truncate">{session?.user?.name || "User Workspace"}</div>
+                <div className="text-xs text-zinc-500 truncate">{session?.user?.email}</div>
+                <div className="text-[9px] bg-white/[0.05] border border-white/[0.06] px-2 py-0.5 rounded-full text-zinc-500 font-medium inline-block mt-2.5">
                   Standard Account
                 </div>
               </div>
             </div>
 
             {/* Total Limits widget */}
-            <div className="bg-foreground/[0.02] border border-foreground/[0.05] rounded-xl px-5 py-4 min-w-[150px] flex flex-col justify-center">
+            <div className="bg-white/[0.03] border border-white/[0.05] rounded-xl px-5 py-4 min-w-[150px] flex flex-col justify-center">
               <div className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Total API Limits</div>
               <div className="text-xl font-black text-accent-primary mt-1">1,500 <span className="text-xs font-normal text-zinc-400">/mo</span></div>
-              <div className="w-full bg-foreground/[0.08] h-1.5 rounded-full overflow-hidden mt-2.5">
+              <div className="w-full bg-white/[0.06] h-1.5 rounded-full overflow-hidden mt-2.5">
                 <div className="bg-accent-primary h-full rounded-full" style={{ width: '4%' }} />
               </div>
             </div>
           </section>
 
           {/* Theme Settings Section */}
-          <section className="glass-panel rounded-2xl p-6 shadow-md border border-foreground/[0.06]">
+          <section className="bg-surface-1/60 backdrop-blur-xl rounded-2xl p-6 border border-white/[0.06]">
             <div className="mb-4">
-              <h2 className="text-md font-bold text-foreground">Theme Settings</h2>
-              <p className="text-xs text-zinc-500 mt-0.5">Customize your editor interface color palette</p>
+              <h2 className="text-base font-semibold text-zinc-100">Theme Settings</h2>
+              <p className="text-xs text-zinc-500 mt-1">Customize your editor interface color palette</p>
             </div>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
@@ -132,24 +132,24 @@ export default function SettingsPage() {
                     onClick={() => setTheme(theme)}
                     className={`group text-left p-4 rounded-xl border transition-all duration-300 relative flex flex-col cursor-pointer active:scale-[0.98] select-none
                       ${isActive
-                        ? "border-accent-primary bg-accent-primary/[0.03] shadow-md shadow-accent-primary/5"
-                        : "border-foreground/5 hover:border-accent-primary/40 hover:bg-foreground/[0.02] bg-foreground/[0.01]"
+                        ? "border-accent-primary/40 bg-accent-primary/[0.05] shadow-sm shadow-accent-primary/10"
+                        : "border border-white/[0.06] bg-white/[0.02] hover:border-white/[0.12] hover:bg-white/[0.03]"
                       }`}
                   >
                     {/* Theme header */}
                     <div className="flex items-center justify-between w-full">
                       <div className="flex items-center gap-2.5">
                         <span 
-                          className="w-4 h-4 rounded-full border border-foreground/10 shrink-0 shadow-sm"
+                          className="w-4 h-4 rounded-full border border-white/[0.08] shrink-0 shadow-sm"
                           style={{ background: `rgb(${theme.colors.accentPrimary})` }}
                         />
-                        <span className="text-xs font-bold text-foreground group-hover:text-accent-primary transition-colors">
+                        <span className="text-xs font-semibold text-zinc-300 group-hover:text-zinc-100 transition-colors">
                           {theme.name}
                         </span>
                       </div>
                       
                       {isActive && (
-                        <div className="flex h-4 w-4 items-center justify-center rounded-full bg-accent-primary text-white">
+                        <div className="flex items-center justify-center bg-accent-primary text-white rounded-full h-4 w-4">
                           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-2.5 h-2.5">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                           </svg>
@@ -158,24 +158,24 @@ export default function SettingsPage() {
                     </div>
 
                     {/* Simulating Palette Preview cards */}
-                    <div className="mt-3 bg-white/[0.01] border border-foreground/[0.04] p-1.5 rounded-lg flex gap-1.5 items-center w-full justify-between">
+                    <div className="mt-3 bg-black/20 border border-white/[0.04] p-1.5 rounded-lg flex gap-1.5 items-center w-full justify-between">
                       <span className="text-[10px] text-zinc-500 font-mono">Palette</span>
                       <div className="flex gap-1 shrink-0">
                         {/* Background */}
                         <div 
-                          className="w-3.5 h-3.5 rounded border border-foreground/10" 
+                          className="w-4 h-4 rounded-md border border-white/[0.08]" 
                           style={{ background: `rgb(${theme.colors.background})` }}
                           title="Background"
                         />
                         {/* Sidebar bg */}
                         <div 
-                          className="w-3.5 h-3.5 rounded border border-foreground/10" 
+                          className="w-4 h-4 rounded-md border border-white/[0.08]" 
                           style={{ background: `rgb(${theme.colors.backgroundDark})` }}
                           title="Sidebar"
                         />
                         {/* Accent */}
                         <div 
-                          className="w-3.5 h-3.5 rounded border border-foreground/10" 
+                          className="w-4 h-4 rounded-md border border-white/[0.08]" 
                           style={{ background: `rgb(${theme.colors.accentPrimary})` }}
                           title="Accent"
                         />
@@ -188,21 +188,21 @@ export default function SettingsPage() {
           </section>
 
           {/* Model Availability Section */}
-          <section className="glass-panel rounded-2xl p-6 shadow-md border border-foreground/[0.06]">
+          <section className="bg-surface-1/60 backdrop-blur-xl rounded-2xl p-6 border border-white/[0.06]">
             <div className="mb-4">
-              <h2 className="text-md font-bold text-foreground">Available Models</h2>
-              <p className="text-xs text-zinc-500 mt-0.5">Explore AI models supported by your API workspace key</p>
+              <h2 className="text-base font-semibold text-zinc-100">Available Models</h2>
+              <p className="text-xs text-zinc-500 mt-1">Explore AI models supported by your API workspace key</p>
             </div>
             
             <ul className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
               {MODELS.map((model) => (
                 <li 
                   key={model.id} 
-                  className="bg-foreground/[0.02] border border-foreground/[0.04] rounded-xl p-4 flex flex-col justify-between gap-3 hover:border-foreground/10 transition-colors"
+                  className="bg-white/[0.02] border border-white/[0.05] rounded-xl p-4 flex flex-col justify-between gap-3 hover:border-white/[0.08] transition-all duration-200"
                 >
                   <div className="min-w-0">
                     <div className="flex items-center flex-wrap gap-2">
-                      <span className="text-xs font-bold text-foreground">{model.name}</span>
+                      <span className="text-sm font-medium text-zinc-200">{model.name}</span>
                       <span className={`text-[9px] font-bold px-2 py-0.5 rounded border shrink-0 uppercase tracking-wide ${getProviderColor(model.provider)}`}>
                         {getProviderLabel(model.provider)}
                       </span>
@@ -213,12 +213,12 @@ export default function SettingsPage() {
                   </div>
                   
                   {/* Model specifications footer info */}
-                  <div className="flex items-center justify-between text-[10px] text-zinc-500 pt-2 border-t border-foreground/[0.03]">
+                  <div className="flex items-center justify-between text-[10px] text-zinc-500 pt-2 border-t border-white/[0.04]">
                     <div className="flex gap-3">
                       <span>Max Tokens: <strong className="text-zinc-400">{model.maxTokens.toLocaleString()}</strong></span>
                     </div>
                     <span className="text-green-500 font-semibold flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-ping" />
+                      <span className="w-1.5 h-1.5 bg-green-500 rounded-full" />
                       Active
                     </span>
                   </div>
@@ -232,4 +232,4 @@ export default function SettingsPage() {
       </div>
     </div>
   );
-} 
+}
