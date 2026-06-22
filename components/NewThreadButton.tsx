@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 
 interface NewThreadButtonProps {
   className?: string;
+  collapsed?: boolean;
 }
 
-export function NewThreadButton({ className = "" }: NewThreadButtonProps) {
+export function NewThreadButton({ className = "", collapsed = false }: NewThreadButtonProps) {
   const [isCreating, setIsCreating] = useState(false);
 
   const startNewChat = () => {
@@ -18,21 +19,25 @@ export function NewThreadButton({ className = "" }: NewThreadButtonProps) {
     <button
       onClick={startNewChat}
       disabled={isCreating}
-      className={`flex items-center gap-2 rounded-lg border-none p-3 text-sm font-semibold transition-all bg-gradient-to-br from-accent-primary to-accent-primary-dark text-white shadow-md hover:from-accent-primary-dark hover:to-accent-primary focus:outline-none focus:ring-2 focus:ring-accent-primary disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
+      title={collapsed ? "Start New Chat" : undefined}
+      className={`flex items-center gap-2 rounded-xl border-none font-semibold transition-all duration-300 active:scale-95 bg-gradient-to-br from-accent-primary to-accent-primary-dark text-white shadow-md hover:shadow-lg hover:shadow-accent-primary/20 hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-accent-primary/50 disabled:cursor-not-allowed disabled:opacity-50
+        ${collapsed ? "p-3.5 justify-center w-11 h-11" : "px-4 py-3 justify-center w-full text-sm"} 
+        ${className}
+      `}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
-        strokeWidth="2"
+        strokeWidth="2.5"
         strokeLinecap="round"
         strokeLinejoin="round"
-        className="h-4 w-4"
+        className="h-4 w-4 shrink-0"
       >
         <path d="M12 5v14M5 12h14" />
       </svg>
-      New Chat
+      {!collapsed && <span>New Chat</span>}
     </button>
   );
-} 
+}

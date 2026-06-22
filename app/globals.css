@@ -4,23 +4,23 @@
 
 :root {
   /* Neutrals */
-  --foreground-rgb: 249, 249, 249;       /* #ECF0F4 – light gray for text */
-  --background-rgb: 22, 33, 62;         /* #0F172A – deep navy */
-  --background-dark-rgb: 26, 26, 46;    /* #0A0D17 – near‑black */
+  --foreground-rgb: 249, 249, 249;       /* Light gray text */
+  --background-rgb: 22, 33, 62;         /* Deep navy */
+  --background-dark-rgb: 26, 26, 46;    /* Near-black */
 
   /* Primary Accent */
-  --accent-primary-rgb: 233, 70, 96;    /* #4F46E5 – indigo-600 */
-  --accent-primary-dark-rgb: 15, 52, 96;/* #4338CA – indigo-700 */
+  --accent-primary-rgb: 233, 70, 96;    /* Coral red */
+  --accent-primary-dark-rgb: 15, 52, 96;/* Indigo-blue */
 
   /* Secondary Accent */
-  --accent-secondary-rgb: 15, 52, 96;/* #10B981 – emerald-500 */
-  --accent-secondary-dark-rgb: 5, 150, 105; /* #059669 – emerald-600 */
+  --accent-secondary-rgb: 15, 52, 96;
+  --accent-secondary-dark-rgb: 5, 150, 105;
 
   /* Semantic / Feedback Colors */
-  --accent-success-rgb: 34, 197, 94;    /* #22C55E – green-500 */
-  --accent-warning-rgb: 234, 179, 8;    /* #EAB308 – amber-500 */
-  --accent-error-rgb: 239, 68, 68;      /* #EF4444 – red-500 */
-  --accent-info-rgb: 56, 189, 248;      /* #38BDF8 – sky-400 */
+  --accent-success-rgb: 34, 197, 94;
+  --accent-warning-rgb: 234, 179, 8;
+  --accent-error-rgb: 239, 68, 68;
+  --accent-info-rgb: 56, 189, 248;
 }
 
 html, body {
@@ -29,9 +29,10 @@ html, body {
   background: rgb(var(--background-rgb));
   color: rgb(var(--foreground-rgb));
   box-sizing: border-box;
-  font-family: var(--font-inter), system-ui, sans-serif;
+  font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow: hidden; /* Prevent body scroll, layout handles it */
 }
 
 body, #__next, #root {
@@ -45,43 +46,150 @@ body, #__next, #root {
 }
 
 ::selection {
+  background: rgba(var(--accent-primary-rgb), 0.25);
+  color: rgb(var(--foreground-rgb));
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(var(--foreground-rgb), 0.08);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
   background: rgba(var(--accent-primary-rgb), 0.3);
 }
 
-input, textarea, select, button {
-  color: rgb(var(--foreground-rgb));
-  background: rgb(var(--background-dark-rgb));
+/* Markdown and chat message content formatting */
+.prose, .markdown {
+  font-size: 0.925rem;
+  line-height: 1.6;
+  letter-spacing: -0.011em;
 }
 
-/* Markdown and chat message content */
-.markdown, .prose, .chat-message {
-  color: rgb(var(--foreground-rgb));
+.prose p, .markdown p {
+  margin-bottom: 0.85em;
 }
-.markdown a, .prose a {
-  color: rgb(var(--accent-primary-rgb));
-  text-decoration: underline;
+
+.prose p:last-child, .markdown p:last-child {
+  margin-bottom: 0;
 }
-.markdown code, .prose code {
-  background: rgb(var(--background-dark-rgb));
+
+.prose a, .markdown a {
   color: rgb(var(--accent-primary-rgb));
-  padding: 0.2em 0.4em;
+  text-decoration: none;
+  font-weight: 500;
+  border-bottom: 1px dashed rgba(var(--accent-primary-rgb), 0.5);
+  transition: border-bottom-color 0.2s;
+}
+
+.prose a:hover, .markdown a:hover {
+  border-bottom-style: solid;
+}
+
+.prose code, .markdown code {
+  background: rgba(var(--foreground-rgb), 0.06);
+  color: rgb(var(--accent-primary-rgb));
+  padding: 0.15em 0.35em;
   border-radius: 4px;
-  font-size: 0.95em;
+  font-size: 0.875em;
+  font-family: monospace;
 }
-.markdown pre, .prose pre {
-  background: rgb(var(--background-dark-rgb));
-  color: rgb(var(--foreground-rgb));
-  border-radius: 8px;
-  padding: 1em;
+
+.prose pre, .markdown pre {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(var(--foreground-rgb), 0.06);
+  border-radius: 12px;
+  padding: 1rem;
+  margin: 1rem 0;
   overflow-x: auto;
 }
 
-/* Scrollbar styling for dark mode */
-::-webkit-scrollbar {
-  width: 8px;
-  background: rgb(var(--background-dark-rgb));
+.prose pre code, .markdown pre code {
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  border-radius: 0;
+  font-size: 0.85em;
 }
-::-webkit-scrollbar-thumb {
-  background: rgb(var(--accent-primary-dark-rgb));
-  border-radius: 8px;
+
+.prose ul, .markdown ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.prose ol, .markdown ol {
+  list-style-type: decimal;
+  padding-left: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.prose li, .markdown li {
+  margin-bottom: 0.25rem;
+}
+
+.prose h1, .markdown h1,
+.prose h2, .markdown h2,
+.prose h3, .markdown h3 {
+  font-weight: 600;
+  color: rgb(var(--foreground-rgb));
+  margin-top: 1.2em;
+  margin-bottom: 0.5em;
+}
+
+.prose h1, .markdown h1 { font-size: 1.4em; }
+.prose h2, .markdown h2 { font-size: 1.25em; }
+.prose h3, .markdown h3 { font-size: 1.1em; }
+
+/* Typing indicator animations */
+@keyframes typing-bounce {
+  0%, 100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  50% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+
+.typing-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: currentColor;
+  animation: typing-bounce 1.4s infinite ease-in-out;
+}
+
+.typing-dot:nth-child(1) {
+  animation-delay: 0s;
+}
+.typing-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.typing-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+/* Glassmorphism utility helpers */
+.glass-panel {
+  background: rgba(var(--background-dark-rgb), 0.5);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(var(--foreground-rgb), 0.06);
+}
+
+.glass-panel-light {
+  background: rgba(var(--foreground-rgb), 0.03);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(var(--foreground-rgb), 0.05);
 }

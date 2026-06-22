@@ -1,8 +1,8 @@
 "use client";
 
+import React, { useEffect } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 import { MODELS } from "@/lib/models";
 import { useTheme } from "@/app/context/ThemeContext";
 import { themes } from "@/lib/themes";
@@ -19,135 +19,216 @@ export default function SettingsPage() {
   }, [status, router]);
 
   if (status === "loading") {
-    return <div className="flex items-center justify-center min-h-screen bg-background text-foreground">Loading...</div>;
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-background text-foreground gap-3">
+        <div className="w-8 h-8 border-3 border-accent-primary border-t-transparent rounded-full animate-spin" />
+        <span className="text-sm text-zinc-500 font-medium">Loading settings...</span>
+      </div>
+    );
   }
 
+  const getProviderColor = (provider: string) => {
+    switch (provider) {
+      case 'google': return 'bg-blue-500 text-blue-100 border-blue-500/10';
+      case 'openai': return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
+      case 'anthropic': return 'bg-amber-500/10 text-amber-400 border-amber-500/20';
+      case 'qwen': return 'bg-purple-500/10 text-purple-400 border-purple-500/20';
+      default: return 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20';
+    }
+  };
+
+  const getProviderLabel = (provider: string) => {
+    switch (provider) {
+      case 'google': return 'Google';
+      case 'openai': return 'OpenAI';
+      case 'anthropic': return 'Anthropic';
+      case 'qwen': return 'Qwen';
+      default: return provider;
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-background text-foreground p-8">
-      <div className="max-w-4xl mx-auto space-y-8">
-        <div className="flex items-center gap-4 mb-8">
-          <button
-            onClick={() => router.push("/")}
-            className="flex items-center gap-2 px-5 py-2.5 bg-accent-primary hover:bg-accent-primary-dark text-white rounded-lg font-semibold shadow-lg transition-all duration-200 hover:scale-105 hover:shadow-xl"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-            </svg>
-            Back
-          </button>
-          <h1 className="text-3xl font-bold text-accent-primary">Settings</h1>
-        </div>
-
-        {/* Theme Settings Section */}
-        <section className="bg-background-dark rounded-lg p-6 shadow">
-          <h2 className="text-xl font-semibold mb-4">Theme Settings</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {themes.map((theme) => (
-              <button
-                key={theme.name}
-                onClick={() => setTheme(theme)}
-                className={`p-4 rounded-lg border-2 transition-all ${
-                  currentTheme.name === theme.name
-                    ? "border-accent-primary bg-accent-primary/10"
-                    : "border-background hover:border-accent-primary/50"
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <div
-                    className="w-8 h-8 rounded-full"
-                    style={{
-                      background: `rgb(${theme.colors.accentPrimary})`,
-                    }}
-                  />
-                  <span className="font-medium">{theme.name}</span>
-                </div>
-                <div className="mt-2 flex gap-1">
-                  <div
-                    className="w-4 h-4 rounded"
-                    style={{
-                      background: `rgb(${theme.colors.background})`,
-                    }}
-                  />
-                  <div
-                    className="w-4 h-4 rounded"
-                    style={{
-                      background: `rgb(${theme.colors.backgroundDark})`,
-                    }}
-                  />
-                  <div
-                    className="w-4 h-4 rounded"
-                    style={{
-                      background: `rgb(${theme.colors.accentPrimary})`,
-                    }}
-                  />
-                </div>
-              </button>
-            ))}
-          </div>
-        </section>
-
-        {/* User Settings Section */}
-        <section className="bg-background-dark rounded-lg p-6 shadow">
-          <h2 className="text-xl font-semibold mb-4">User Settings</h2>
-          <div className="space-y-4">
-            <div className="flex items-center gap-4">
-              {session?.user?.image ? (
-                <img
-                  src={session.user.image}
-                  alt={session.user.name || "User"}
-                  className="w-16 h-16 rounded-full border-2 border-accent-primary shadow"
-                />
-              ) : (
-                <div className="w-16 h-16 rounded-full bg-accent-primary flex items-center justify-center text-2xl font-bold text-white shadow">
-                  {session?.user?.name?.[0] || "U"}
-                </div>
-              )}
-              <div>
-                <div className="text-lg font-semibold">{session?.user?.name}</div>
-                <div className="text-zinc-400">{session?.user?.email}</div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Request Limit Section */}
-        <section className="bg-background-dark rounded-lg p-6 shadow">
-          <h2 className="text-xl font-semibold mb-4">Request Limit</h2>
-          <div className="flex justify-between items-center">
+    <div className="min-h-screen bg-background text-foreground overflow-y-auto px-4 py-8 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto space-y-8 pb-12">
+        
+        {/* Header navigation bar */}
+        <div className="flex items-center justify-between pb-6 border-b border-foreground/[0.04]">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => router.push("/")}
+              className="flex items-center justify-center h-10 w-10 bg-foreground/[0.02] border border-foreground/10 hover:bg-foreground/[0.06] text-zinc-300 hover:text-foreground rounded-xl transition-all cursor-pointer active:scale-95 shadow-sm"
+              title="Go Back"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+              </svg>
+            </button>
             <div>
-              <div className="font-medium">Total Request Limit</div>
-              <div className="text-sm text-zinc-400">Maximum requests allowed</div>
+              <h1 className="text-2xl font-extrabold tracking-tight">Settings</h1>
+              <p className="text-xs text-zinc-500 font-medium">Manage your workspace configuration and preferences</p>
             </div>
-            <div className="text-lg font-semibold text-accent-primary">1500</div>
           </div>
-        </section>
 
-        {/* Model Availability Section */}
-        <section className="bg-background-dark rounded-lg p-6 shadow">
-          <h2 className="text-xl font-semibold mb-4">Available Models</h2>
-          <ul className="space-y-4">
-            {MODELS.map((model) => (
-              <li key={model.id} className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 bg-background rounded-lg p-4">
-                <div>
-                  <div className="font-medium text-accent-primary">{model.name}</div>
-                  <div className="text-sm text-zinc-400">{model.description}</div>
-                  <div className="text-xs text-zinc-500 mt-1">Provider: {model.provider}, Max Tokens: {model.maxTokens.toLocaleString()}</div>
-                </div>
-                <div className="text-green-400 font-semibold text-sm">Available</div>
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        {/* Sign Out Button */}
-        <div className="flex justify-end">
           <button
             onClick={() => signOut()}
-            className="px-6 py-2 bg-red-600 hover:bg-red-700 rounded-lg font-semibold transition-colors"
+            className="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/30 text-red-400 rounded-xl text-xs font-semibold transition-all active:scale-95 cursor-pointer"
           >
             Sign Out
           </button>
         </div>
+
+        {/* Settings Grid */}
+        <div className="grid grid-cols-1 gap-6">
+          
+          {/* User Profile Section */}
+          <section className="glass-panel rounded-2xl p-6 shadow-md border border-foreground/[0.06] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="relative shrink-0">
+                {session?.user?.image ? (
+                  <img
+                    src={session.user.image}
+                    alt={session.user.name || "User"}
+                    className="w-16 h-16 rounded-2xl border border-foreground/10 object-cover shadow-sm"
+                  />
+                ) : (
+                  <div className="w-16 h-16 rounded-2xl bg-accent-primary flex items-center justify-center text-2xl font-bold text-white shadow-sm shadow-accent-primary/20">
+                    {session?.user?.name?.[0] || "U"}
+                  </div>
+                )}
+                <div className="absolute -bottom-1 -right-1 w-4.5 h-4.5 bg-green-500 border-2 border-background-dark rounded-full" />
+              </div>
+              <div className="min-w-0">
+                <div className="text-lg font-bold text-foreground truncate">{session?.user?.name || "User Workspace"}</div>
+                <div className="text-xs text-zinc-400 truncate">{session?.user?.email}</div>
+                <div className="text-[9px] bg-foreground/[0.05] border border-foreground/[0.08] px-2 py-0.5 rounded-full inline-block text-zinc-400 font-semibold mt-2.5">
+                  Standard Account
+                </div>
+              </div>
+            </div>
+
+            {/* Total Limits widget */}
+            <div className="bg-foreground/[0.02] border border-foreground/[0.05] rounded-xl px-5 py-4 min-w-[150px] flex flex-col justify-center">
+              <div className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Total API Limits</div>
+              <div className="text-xl font-black text-accent-primary mt-1">1,500 <span className="text-xs font-normal text-zinc-400">/mo</span></div>
+              <div className="w-full bg-foreground/[0.08] h-1.5 rounded-full overflow-hidden mt-2.5">
+                <div className="bg-accent-primary h-full rounded-full" style={{ width: '4%' }} />
+              </div>
+            </div>
+          </section>
+
+          {/* Theme Settings Section */}
+          <section className="glass-panel rounded-2xl p-6 shadow-md border border-foreground/[0.06]">
+            <div className="mb-4">
+              <h2 className="text-md font-bold text-foreground">Theme Settings</h2>
+              <p className="text-xs text-zinc-500 mt-0.5">Customize your editor interface color palette</p>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+              {themes.map((theme) => {
+                const isActive = currentTheme.name === theme.name;
+                return (
+                  <button
+                    key={theme.name}
+                    onClick={() => setTheme(theme)}
+                    className={`group text-left p-4 rounded-xl border transition-all duration-300 relative flex flex-col cursor-pointer active:scale-[0.98] select-none
+                      ${isActive
+                        ? "border-accent-primary bg-accent-primary/[0.03] shadow-md shadow-accent-primary/5"
+                        : "border-foreground/5 hover:border-accent-primary/40 hover:bg-foreground/[0.02] bg-foreground/[0.01]"
+                      }`}
+                  >
+                    {/* Theme header */}
+                    <div className="flex items-center justify-between w-full">
+                      <div className="flex items-center gap-2.5">
+                        <span 
+                          className="w-4 h-4 rounded-full border border-foreground/10 shrink-0 shadow-sm"
+                          style={{ background: `rgb(${theme.colors.accentPrimary})` }}
+                        />
+                        <span className="text-xs font-bold text-foreground group-hover:text-accent-primary transition-colors">
+                          {theme.name}
+                        </span>
+                      </div>
+                      
+                      {isActive && (
+                        <div className="flex h-4 w-4 items-center justify-center rounded-full bg-accent-primary text-white">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-2.5 h-2.5">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                          </svg>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Simulating Palette Preview cards */}
+                    <div className="mt-3 bg-white/[0.01] border border-foreground/[0.04] p-1.5 rounded-lg flex gap-1.5 items-center w-full justify-between">
+                      <span className="text-[10px] text-zinc-500 font-mono">Palette</span>
+                      <div className="flex gap-1 shrink-0">
+                        {/* Background */}
+                        <div 
+                          className="w-3.5 h-3.5 rounded border border-foreground/10" 
+                          style={{ background: `rgb(${theme.colors.background})` }}
+                          title="Background"
+                        />
+                        {/* Sidebar bg */}
+                        <div 
+                          className="w-3.5 h-3.5 rounded border border-foreground/10" 
+                          style={{ background: `rgb(${theme.colors.backgroundDark})` }}
+                          title="Sidebar"
+                        />
+                        {/* Accent */}
+                        <div 
+                          className="w-3.5 h-3.5 rounded border border-foreground/10" 
+                          style={{ background: `rgb(${theme.colors.accentPrimary})` }}
+                          title="Accent"
+                        />
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </section>
+
+          {/* Model Availability Section */}
+          <section className="glass-panel rounded-2xl p-6 shadow-md border border-foreground/[0.06]">
+            <div className="mb-4">
+              <h2 className="text-md font-bold text-foreground">Available Models</h2>
+              <p className="text-xs text-zinc-500 mt-0.5">Explore AI models supported by your API workspace key</p>
+            </div>
+            
+            <ul className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+              {MODELS.map((model) => (
+                <li 
+                  key={model.id} 
+                  className="bg-foreground/[0.02] border border-foreground/[0.04] rounded-xl p-4 flex flex-col justify-between gap-3 hover:border-foreground/10 transition-colors"
+                >
+                  <div className="min-w-0">
+                    <div className="flex items-center flex-wrap gap-2">
+                      <span className="text-xs font-bold text-foreground">{model.name}</span>
+                      <span className={`text-[9px] font-bold px-2 py-0.5 rounded border shrink-0 uppercase tracking-wide ${getProviderColor(model.provider)}`}>
+                        {getProviderLabel(model.provider)}
+                      </span>
+                    </div>
+                    <p className="text-xs text-zinc-500 mt-1.5 leading-relaxed line-clamp-2">
+                      {model.description}
+                    </p>
+                  </div>
+                  
+                  {/* Model specifications footer info */}
+                  <div className="flex items-center justify-between text-[10px] text-zinc-500 pt-2 border-t border-foreground/[0.03]">
+                    <div className="flex gap-3">
+                      <span>Max Tokens: <strong className="text-zinc-400">{model.maxTokens.toLocaleString()}</strong></span>
+                    </div>
+                    <span className="text-green-500 font-semibold flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-ping" />
+                      Active
+                    </span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </section>
+
+        </div>
+
       </div>
     </div>
   );

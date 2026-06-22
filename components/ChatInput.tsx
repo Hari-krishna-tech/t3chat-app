@@ -1,59 +1,89 @@
 "use client";
 
-import { useState } from "react";
-import { ModelType } from "@/lib/models";
-import ModelSelect from "./ModelSelect";
+import React, { useState, useRef, useEffect } from "react";
 
 interface ChatInputProps {
-  onSendMessage: (message: string, model: ModelType) => void;
+  onSendMessage: (message: string) => void;
   isLoading: boolean;
 }
 
 export default function ChatInput({ onSendMessage, isLoading }: ChatInputProps) {
   const [message, setMessage] = useState("");
-  const [selectedModel, setSelectedModel] = useState<ModelType>("qwen/qwen3-8b");
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (message.trim() && !isLoading) {
-      onSendMessage(message.trim(), selectedModel);
+      onSendMessage(message.trim());
       setMessage("");
+      // Reset textarea height
+      if (textareaRef.current) {
+        textareaRef.current.style.height = "auto";
+      }
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit(e);
+    }
+  };
+
+  useEffect(() => {
+    // Auto-adjust height on load/reset
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+    }
+  }, []);
+
+  const handleInput = () => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 180)}px`;
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="border-t border-background-dark p-4 bg-background shadow-lg">
-      <div className="flex items-end gap-4">
-        <div className="flex-1">
+    <div className="p-4 bg-gradient-to-t from-background via-background/95 to-transparent border-t border-foreground/[0.03]">
+      <form onSubmit={handleSubmit} className="max-w-3xl mx-auto relative">
+        <div className="relative flex items-end gap-2 p-2 pr-3 pl-4 rounded-2xl bg-foreground/[0.02] border border-foreground/10 focus-within:border-accent-primary/40 focus-within:ring-2 focus-within:ring-accent-primary/10 transition-all duration-300 backdrop-blur-md shadow-lg">
           <textarea
+            ref={textareaRef}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            placeholder="Type your message..."
-            className="w-full px-4 py-2 bg-background-dark text-foreground rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-accent-primary transition shadow-inner placeholder-zinc-500"
+            onInput={handleInput}
+            onKeyDown={handleKeyDown}
+            placeholder="Ask anything..."
             rows={1}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                handleSubmit(e);
-              }
-            }}
+            className="flex-1 max-h-[180px] min-h-[24px] py-1 bg-transparent text-foreground placeholder-zinc-500 border-none outline-none resize-none text-sm focus:ring-0 leading-relaxed font-sans scrollbar-none"
+            style={{ height: "auto" }}
           />
-        </div>
-        <div className="flex items-center gap-2">
-          <ModelSelect selectedModel={selectedModel} onModelChange={setSelectedModel} />
+
           <button
             type="submit"
             disabled={!message.trim() || isLoading}
-            className="px-4 py-2 bg-gradient-to-br from-accent-primary to-accent-primary-dark text-white rounded-lg font-semibold shadow-md hover:from-accent-primary-dark hover:to-accent-primary focus:outline-none focus:ring-2 focus:ring-accent-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent-primary text-white shadow-md shadow-accent-primary/10 hover:shadow-lg hover:shadow-accent-primary/20 hover:brightness-110 active:scale-95 transition-all duration-200 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed shrink-0"
+            aria-label="Send message"
           >
             {isLoading ? (
-              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
             ) : (
-              "Send"
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                className="w-4 h-4"
+              >
+                <path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z" />
+              </svg>
             )}
           </button>
         </div>
-      </div>
-    </form>
+        <div className="text-[10px] text-zinc-500 text-center mt-2 font-medium">
+          T3.chat can make mistakes. Please check important info.
+        </div>
+      </form>
+    </div>
   );
-} 
+}

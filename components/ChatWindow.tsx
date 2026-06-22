@@ -1,9 +1,11 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+
+import React, { useState, useEffect, useRef } from 'react';
 import ChatInput from './ChatInput';
 import { ModelType } from '@/lib/models';
 import ReactMarkdown from 'react-markdown';
-import { NewThreadButton } from './NewThreadButton';
+import ModelSelect from './ModelSelect';
+import { useSession } from 'next-auth/react';
 
 type Message = {
   id: string;
@@ -18,8 +20,12 @@ type Message = {
 };
 
 export default function ChatWindow({ onSidebarToggle }: { onSidebarToggle: () => void }) {
+  const { data: session } = useSession();
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedModel, setSelectedModel] = useState<ModelType>("qwen/qwen3-8b");
+  const [currentThreadTitle, setCurrentThreadTitle] = useState<string | null>(null);
+
   const [currentThreadId, setCurrentThreadId] = useState<string | null>(() => {
     if (typeof window !== 'undefined') {
       return localStorage.getItem('selectedThreadId');
@@ -33,6 +39,16 @@ export default function ChatWindow({ onSidebarToggle }: { onSidebarToggle: () =>
     return true;
   });
 
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, isLoading]);
+
   useEffect(() => {
     const handleThreadSelect = (event: CustomEvent<{ threadId: string }>) => {
       setCurrentThreadId(event.detail.threadId);
@@ -41,6 +57,7 @@ export default function ChatWindow({ onSidebarToggle }: { onSidebarToggle: () =>
     };
     const handleNewChatStarted = () => {
       setCurrentThreadId(null);
+      setCurrentThreadTitle(null);
       setMessages([]);
       setPendingNewThread(true);
     };
@@ -53,7 +70,6 @@ export default function ChatWindow({ onSidebarToggle }: { onSidebarToggle: () =>
   }, []);
 
   useEffect(() => {
-    // If there's a selected thread on load, fetch its messages
     if (currentThreadId && !pendingNewThread) {
       fetchThreadMessages(currentThreadId);
     }
@@ -65,6 +81,7 @@ export default function ChatWindow({ onSidebarToggle }: { onSidebarToggle: () =>
       if (response.ok) {
         const data = await response.json();
         setMessages(data.messages);
+        setCurrentThreadTitle(data.title || null);
       }
     } catch (error) {
       console.error("Error fetching thread messages:", error);
@@ -79,7 +96,7 @@ export default function ChatWindow({ onSidebarToggle }: { onSidebarToggle: () =>
       const titleRes = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: titlePrompt, model , isTitle: true}),
+        body: JSON.stringify({ messages: titlePrompt, model, isTitle: true }),
       });
       let title = 'New Chat';
       if (titleRes.ok && titleRes.body) {
@@ -105,6 +122,7 @@ export default function ChatWindow({ onSidebarToggle }: { onSidebarToggle: () =>
       if (!threadRes.ok) throw new Error('Failed to create thread');
       const thread = await threadRes.json();
       setCurrentThreadId(thread.id);
+      setCurrentThreadTitle(title);
       setPendingNewThread(false);
       setMessages(thread.messages);
       // Emit event for new thread creation
@@ -128,7 +146,6 @@ export default function ChatWindow({ onSidebarToggle }: { onSidebarToggle: () =>
   };
 
   const getAIResponse = async (message: string, model: ModelType, threadId: string) => {
-    // Prepare context: all messages in the thread so far, including the new user message
     const contextMessages = [
       ...messages,
       {
@@ -140,7 +157,7 @@ export default function ChatWindow({ onSidebarToggle }: { onSidebarToggle: () =>
         user: { name: null, image: null },
       },
     ];
-    // Send the full thread as context
+
     const aiResponse = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -149,7 +166,6 @@ export default function ChatWindow({ onSidebarToggle }: { onSidebarToggle: () =>
     if (!aiResponse.ok) {
       throw new Error('Failed to get AI response');
     }
-    // Create a temporary message for the AI response
     const tempAiMessage: Message = {
       id: 'temp-' + Date.now(),
       content: '',
@@ -162,7 +178,7 @@ export default function ChatWindow({ onSidebarToggle }: { onSidebarToggle: () =>
       },
     };
     setMessages((prev) => [...prev, tempAiMessage]);
-    // Stream the AI response
+    
     const reader = aiResponse.body?.getReader();
     if (!reader) throw new Error('No response body');
     let aiContent = '';
@@ -176,7 +192,6 @@ export default function ChatWindow({ onSidebarToggle }: { onSidebarToggle: () =>
         )
       );
     }
-    // Save the AI response to the database
     const finalAiResponse = await fetch('/api/messages', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -195,15 +210,14 @@ export default function ChatWindow({ onSidebarToggle }: { onSidebarToggle: () =>
     );
   };
 
-  const onSendMessage = async (message: string, model: ModelType) => {
+  const onSendMessage = async (message: string) => {
     if (pendingNewThread) {
-      await createThreadAndSendMessage(message, model);
+      await createThreadAndSendMessage(message, selectedModel);
       return;
     }
     if (!currentThreadId) return;
     try {
       setIsLoading(true);
-      // First, send the user's message
       const userResponse = await fetch('/api/messages', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -218,7 +232,7 @@ export default function ChatWindow({ onSidebarToggle }: { onSidebarToggle: () =>
       }
       const userMessage = await userResponse.json();
       setMessages((prev) => [...prev, userMessage]);
-      await getAIResponse(message, model, currentThreadId);
+      await getAIResponse(message, selectedModel, currentThreadId);
     } catch (err) {
       console.error('Error in message flow:', err);
     } finally {
@@ -226,37 +240,183 @@ export default function ChatWindow({ onSidebarToggle }: { onSidebarToggle: () =>
     }
   };
 
+  const firstName = session?.user?.name ? session.user.name.split(' ')[0] : 'there';
+
+  const suggestionCards = [
+    {
+      title: "Draft an email",
+      subtitle: "to my team announcing a project launch",
+      prompt: "Write a professional email to my team announcing the successful launch of our new project. Keep it engaging and concise."
+    },
+    {
+      title: "Explain a concept",
+      subtitle: "like JavaScript Promises under the hood",
+      prompt: "Explain how JavaScript Promises work under the hood using a simple real-world analogy."
+    },
+    {
+      title: "Help me plan",
+      subtitle: "a 3-day budget travel trip to Tokyo",
+      prompt: "Provide a 3-day travel itinerary for visiting Tokyo on a moderate budget, focusing on food and culture."
+    },
+    {
+      title: "Design a routine",
+      subtitle: "beginner strength bodyweight workout",
+      prompt: "Design a 4-week beginner-friendly bodyweight workout routine aimed at building general strength."
+    }
+  ];
+
   return (
-    <section className="flex flex-col flex-1 h-full bg-background">
+    <section className="flex flex-col flex-1 h-full bg-background relative overflow-hidden">
       {/* Header */}
-      <header className="px-6 py-4 border-b border-background-dark bg-background-dark/90 backdrop-blur flex items-center justify-between">
-        <h1 className="text-lg font-bold text-accent-primary hidden">T3.chat</h1>
-        <NewThreadButton className="px-3 py-1 bg-accent-primary hover:bg-accent-primary-dark text-white border-none shadow" />
-      </header>
-      {/* Chat messages */}
-      <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4 bg-background">
-        {messages.length === 0 && pendingNewThread && (
-          <div className="text-zinc-500 text-center mt-10">Start a new conversation...</div>
-        )}
-        {messages.map((msg) => (
-          <div
-            key={msg.id}
-            className={`flex ${msg.isAi ? 'justify-start' : 'justify-end'}`}
+      <header className="px-4 py-3 border-b border-foreground/[0.04] bg-background/50 backdrop-blur-md flex items-center justify-between z-10">
+        <div className="flex items-center gap-3">
+          {/* Hamburger Menu to Toggle Sidebar */}
+          <button
+            onClick={onSidebarToggle}
+            className="p-1.5 rounded-lg bg-foreground/[0.02] border border-foreground/[0.05] text-zinc-400 hover:text-foreground hover:bg-foreground/[0.06] transition-all cursor-pointer active:scale-95"
+            title="Toggle Sidebar"
           >
-            <div
-              className={`rounded-lg px-4 py-2 shadow-none text-sm max-w-xl
-                ${msg.isAi
-                  ? 'text-foreground'
-                  : 'text-accent-primary'}
-              `}
-            >
-              <ReactMarkdown>{msg.content}</ReactMarkdown>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4.5 h-4.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12" />
+            </svg>
+          </button>
+          
+          {/* Active Thread Title */}
+          {currentThreadTitle && (
+            <span className="text-sm font-semibold truncate max-w-[200px] sm:max-w-[300px] text-foreground">
+              {currentThreadTitle}
+            </span>
+          )}
+        </div>
+
+        {/* Model Selector in Header */}
+        <ModelSelect selectedModel={selectedModel} onModelChange={setSelectedModel} align="right" />
+      </header>
+
+      {/* Chat Messages and Landing Dashboard */}
+      <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6">
+        {messages.length === 0 && pendingNewThread ? (
+          /* Modern Landing Dashboard */
+          <div className="max-w-2xl mx-auto flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent-primary text-white font-black text-lg shadow-lg shadow-accent-primary/20 mb-6 animate-pulse">
+              T3
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight bg-gradient-to-r from-foreground via-foreground to-accent-primary bg-clip-text text-transparent mb-2">
+              Hi {firstName}, how can I help you today?
+            </h2>
+            <p className="text-zinc-500 text-sm max-w-md mb-8 leading-relaxed">
+              Choose a model above and prompt below to start a conversation, or select one of the ideas below.
+            </p>
+
+            {/* Suggestions Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-xl">
+              {suggestionCards.map((card, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => onSendMessage(card.prompt)}
+                  className="p-4 text-left rounded-2xl bg-foreground/[0.02] border border-foreground/[0.05] hover:bg-foreground/[0.05] hover:border-accent-primary/30 transition-all duration-300 group cursor-pointer"
+                >
+                  <div className="text-xs font-semibold text-foreground group-hover:text-accent-primary transition-colors">
+                    {card.title}
+                  </div>
+                  <div className="text-[11px] text-zinc-500 mt-1 line-clamp-1">
+                    {card.subtitle}
+                  </div>
+                </button>
+              ))}
             </div>
           </div>
-        ))}
+        ) : (
+          /* Chat List */
+          <div className="max-w-3xl mx-auto space-y-6 pb-4">
+            {messages.map((msg) => {
+              const isAi = msg.isAi;
+              return (
+                <div
+                  key={msg.id}
+                  className={`flex gap-3 items-start ${isAi ? 'justify-start' : 'justify-end'}`}
+                >
+                  {/* AI Avatar */}
+                  {isAi && (
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent-primary/10 text-accent-primary shadow-inner mt-1">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4.5 h-4.5">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 21m0 0l-.813-5.096M9 21h3m-3.07-19.141a4.298 4.298 0 00-3.32 1.488c-.915 1.053-1.393 2.457-1.32 3.869l.718 13.918a.75.75 0 00.747.711H12.75M9 6h.008v.008H9V6zm.37 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                      </svg>
+                    </div>
+                  )}
+
+                  {/* Message Bubble */}
+                  <div
+                    className={`rounded-2xl max-w-[85%] sm:max-w-[75%] px-4 py-2.5 text-sm leading-relaxed shadow-sm
+                      ${isAi
+                        ? 'bg-foreground/[0.02] border border-foreground/[0.05] rounded-tl-none text-foreground'
+                        : 'bg-gradient-to-br from-accent-primary to-accent-primary-dark text-white rounded-tr-none ml-auto'}
+                    `}
+                  >
+                    <ReactMarkdown
+                      components={{
+                        // Custom code renderer with headers and Copy buttons
+                        code({ className, children, ...props }) {
+                          const match = /language-(\w+)/.exec(className || '');
+                          const codeContent = String(children).replace(/\n$/, '');
+                          return match ? (
+                            <div className="my-3 overflow-hidden rounded-xl border border-foreground/[0.08] bg-black/45 shadow-inner">
+                              <div className="flex items-center justify-between px-3 py-1.5 bg-white/[0.03] border-b border-white/[0.05] text-[10px] text-zinc-400 font-mono">
+                                <span>{match[1]}</span>
+                                <button
+                                  onClick={() => navigator.clipboard.writeText(codeContent)}
+                                  className="hover:text-white transition-colors flex items-center gap-1 active:scale-95 cursor-pointer"
+                                >
+                                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3 h-3">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H5.25m14.25 14.25v-10.5A2.25 2.25 0 0017.25 7.5h-9a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 008.25 22.5h9a2.25 2.25 0 002.25-2.25z" />
+                                  </svg>
+                                  Copy
+                                </button>
+                              </div>
+                              <pre className="p-3 overflow-x-auto text-[11px] leading-relaxed font-mono">
+                                <code className={className} {...props}>
+                                  {children}
+                                </code>
+                              </pre>
+                            </div>
+                          ) : (
+                            <code className="bg-white/10 px-1 py-0.5 rounded font-mono text-[12px] text-accent-primary" {...props}>
+                              {children}
+                            </code>
+                          );
+                        }
+                      }}
+                    >
+                      {msg.content}
+                    </ReactMarkdown>
+                  </div>
+                </div>
+              );
+            })}
+
+            {/* Typing indicator spinner dot card */}
+            {isLoading && messages.length > 0 && !messages[messages.length - 1].isAi && (
+              <div className="flex gap-3 items-start justify-start">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent-primary/10 text-accent-primary shadow-inner mt-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4.5 h-4.5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 21m0 0l-.813-5.096M9 21h3m-3.07-19.141a4.298 4.298 0 00-3.32 1.488c-.915 1.053-1.393 2.457-1.32 3.869l.718 13.918a.75.75 0 00.747.711H12.75M9 6h.008v.008H9V6zm.37 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                  </svg>
+                </div>
+                <div className="rounded-2xl rounded-tl-none bg-foreground/[0.02] border border-foreground/[0.05] px-4 py-3 max-w-[150px] flex items-center gap-1.5 text-zinc-400">
+                  <span className="typing-dot" />
+                  <span className="typing-dot" />
+                  <span className="typing-dot" />
+                </div>
+              </div>
+            )}
+            
+            <div ref={messagesEndRef} />
+          </div>
+        )}
       </div>
-      {/* Message input */}
-        <ChatInput onSendMessage={onSendMessage} isLoading={isLoading} />
+
+      {/* Floating capsule text input */}
+      <ChatInput onSendMessage={onSendMessage} isLoading={isLoading} />
     </section>
   );
 } 
