@@ -1,8 +1,4 @@
 import { ModelType } from "./models";
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
-// Initialize Google AI
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || "");
 
 type MessageType = {
   id: string;
@@ -17,68 +13,118 @@ type MessageType = {
 };
 
 export async function* streamModelResponse(model: ModelType, messages: string | MessageType[], isTitle: boolean) {
-  // Convert messages to string if needed
-  let messageString = "";
-  if(isTitle) {
-    messageString = messages as string;
+  let openrouterMessages: { role: string; content: string }[] = [];
+
+  if (isTitle) {
+    // If it's a title request, it's just a single string prompt
+    const promptString = typeof messages === "string" ? messages : "Suggest a short, relevant chat title";
+    openrouterMessages = [
+      { role: "user", content: promptString }
+    ];
   } else {
-    messageString = Array.isArray(messages)
-    // here m is the MessageType
-    ? messages.map(m => m.content).join("\n\n")
-    : messages;
+    // If it's a conversation history, map it to the proper OpenAI roles
+    const formattedMessages = Array.isArray(messages)
+      ? messages.map((m) => ({
+          role: m.isAi ? "assistant" : "user",
+          content: m.content,
+        }))
+      : [{ role: "user", content: messages }];
+
+    openrouterMessages = [
+      { role: "system", content: "You are a helpful assistant. Answer in markdown format. Be concise and to the point." },
+      ...formattedMessages
+    ];
   }
 
-  switch (model) {
-    case "gemini-pro":
-      yield* streamGeminiResponse(messageString);
-      break;
-    case "gemini-2.0-flash":
-      yield* streamGemini20FlashResponse(messageString); 
-      break;
-    case "gpt-4":
-    case "gpt-3.5-turbo":
-      // TODO: Implement OpenAI streaming
-      throw new Error("OpenAI streaming not implemented yet");
-    case "claude-3-opus":
-      // TODO: Implement Claude streaming
-      throw new Error("Claude streaming not implemented yet");
-    default:
-      throw new Error(`Model ${model} not supported`);
-  }
+  yield* streamOpenRouterResponse(model, openrouterMessages);
 }
 
-async function* streamGemini20FlashResponse(message: string) {
-  try {
-    // add system prompt
-    const systemPrompt = "You are a helpful assistant. answer in markdown format. be concise and to the point.";
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-    const result = await model.generateContentStream(systemPrompt + "\n\n" + message);
+async function* streamOpenRouterResponse(modelId: string, messages: { role: string; content: string }[]) {
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  if (!apiKey) {
+    console.error("Missing OPENROUTER_API_KEY env variable");
+    yield "Error: OPENROUTER_API_KEY is not configured.";
+    return;
+  }
 
-    for await (const chunk of result.stream) {
-      const text = chunk.text();
-      if (text) {
-        yield text;
+  try {
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://t3chat-app.vercel.app",
+        "X-Title": "T3.chat",
+      },
+      body: JSON.stringify({
+        model: modelId,
+        messages: messages,
+        stream: true,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`OpenRouter API error (status ${response.status}):`, errorText);
+      yield `Error calling OpenRouter: ${response.status} ${response.statusText}`;
+      return;
+    }
+
+    const reader = response.body?.getReader();
+    if (!reader) {
+      yield "Error: Response body is not readable.";
+      return;
+    }
+
+    const decoder = new TextDecoder("utf-8");
+    let buffer = "";
+
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split("\n");
+      buffer = lines.pop() || "";
+
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed) continue;
+        if (trimmed === "data: [DONE]") continue;
+
+        if (trimmed.startsWith("data: ")) {
+          const jsonStr = trimmed.slice(6);
+          try {
+            const parsed = JSON.parse(jsonStr);
+            const content = parsed.choices?.[0]?.delta?.content;
+            if (content) {
+              yield content;
+            }
+          } catch (e) {
+            console.warn("Failed to parse SSE JSON chunk:", jsonStr, e);
+          }
+        }
+      }
+    }
+
+    // Handle remaining buffer if any
+    if (buffer && buffer.startsWith("data: ")) {
+      const trimmed = buffer.trim();
+      if (trimmed !== "data: [DONE]") {
+        const jsonStr = trimmed.slice(6);
+        try {
+          const parsed = JSON.parse(jsonStr);
+          const content = parsed.choices?.[0]?.delta?.content;
+          if (content) {
+            yield content;
+          }
+        } catch (e) {
+          console.warn("Failed to parse SSE JSON chunk from final buffer:", jsonStr, e);
+        }
       }
     }
   } catch (error) {
-    console.error("Error in Gemini streaming:", error);
-    throw error;
-  }
-}
-
-async function* streamGeminiResponse(message: string) {
-  try {
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-    const result = await model.generateContentStream(message);
-    
-    for await (const chunk of result.stream) {
-      const text = chunk.text();
-      if (text) {
-        yield text;
-      }
-    }
-  } catch (error) {
-    console.error("Error in Gemini streaming:", error);
-    throw error;
+    console.error("Network error streaming OpenRouter response:", error);
+    yield "Error: Failed to fetch streaming response from OpenRouter.";
   }
 }
