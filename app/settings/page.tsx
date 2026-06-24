@@ -5,6 +5,7 @@ import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { MODELS } from "@/lib/models";
 import { useTheme } from "@/app/context/ThemeContext";
+import { ProviderIcon } from "@/components/ProviderIcon";
 import { themes } from "@/lib/themes";
 
 export default function SettingsPage() {
@@ -470,10 +471,13 @@ export default function SettingsPage() {
                   className="bg-white/[0.02] border border-white/[0.05] rounded-xl p-3 sm:p-4 flex flex-col justify-between gap-2 sm:gap-3 hover:border-white/[0.08] transition-all duration-200"
                 >
                   <div className="min-w-0">
-                    <div className="flex items-center flex-wrap gap-2">
-                      <span className="text-sm font-medium text-zinc-200">{model.name}</span>
-                      <span className={`text-[9px] font-bold px-2 py-0.5 rounded border shrink-0 uppercase tracking-wide ${getProviderColor(model.provider)}`}>
-                        {getProviderLabel(model.provider)}
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-sm font-medium text-zinc-200 truncate">{model.name}</span>
+                      <span 
+                        className={`inline-flex items-center justify-center p-1 rounded-lg border shrink-0 ${getProviderColor(model.provider)}`}
+                        title={getProviderLabel(model.provider)}
+                      >
+                        <ProviderIcon provider={model.provider} className="w-3.5 h-3.5" />
                       </span>
                     </div>
                     <p className="text-xs text-zinc-500 mt-1.5 leading-relaxed line-clamp-2">

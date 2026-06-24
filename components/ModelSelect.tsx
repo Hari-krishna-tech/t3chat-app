@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { ModelType, MODELS } from "@/lib/models";
+import { ProviderIcon } from "./ProviderIcon";
 
 interface ModelSelectProps {
   selectedModel: ModelType;
@@ -46,6 +47,26 @@ export default function ModelSelect({ selectedModel, onModelChange, align = 'lef
     }
   };
 
+  const getProviderTextColor = (provider: string) => {
+    switch (provider.toLowerCase()) {
+      case 'google': return 'text-blue-400';
+      case 'openai': return 'text-emerald-400';
+      case 'anthropic': return 'text-amber-400';
+      case 'qwen': return 'text-purple-400';
+      default: return 'text-zinc-400';
+    }
+  };
+
+  const getProviderBadgeStyle = (provider: string) => {
+    switch (provider.toLowerCase()) {
+      case 'google': return 'bg-blue-500/10 text-blue-400 border-blue-500/15';
+      case 'openai': return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/15';
+      case 'anthropic': return 'bg-amber-500/10 text-amber-400 border-amber-500/15';
+      case 'qwen': return 'bg-purple-500/10 text-purple-400 border-purple-500/15';
+      default: return 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20';
+    }
+  };
+
   const groupedModels = MODELS.reduce((acc, model) => {
     if (!acc[model.provider]) acc[model.provider] = [];
     acc[model.provider].push(model);
@@ -59,7 +80,11 @@ export default function ModelSelect({ selectedModel, onModelChange, align = 'lef
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-1.5 sm:gap-2 bg-white/[0.08] border border-white/[0.12] text-zinc-300 hover:text-zinc-100 hover:bg-white/[0.12] rounded-full px-2.5 sm:px-3 py-1.5 text-[11px] sm:text-xs font-medium transition-all duration-200 active:scale-95 cursor-pointer"
       >
-        <span className={`w-2 h-2 rounded-full ${selectedModelConfig ? getProviderColor(selectedModelConfig.provider) : 'bg-zinc-500'} shadow-sm`} />
+        {selectedModelConfig ? (
+          <ProviderIcon provider={selectedModelConfig.provider} className={`w-3.5 h-3.5 ${getProviderTextColor(selectedModelConfig.provider)}`} />
+        ) : (
+          <span className="w-2 h-2 rounded-full bg-zinc-500 shadow-sm" />
+        )}
         <span className="truncate max-w-[80px] sm:max-w-[120px] md:max-w-none">{selectedModelConfig?.name}</span>
         <svg
           className={`w-3.5 h-3.5 text-zinc-600 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
@@ -82,7 +107,7 @@ export default function ModelSelect({ selectedModel, onModelChange, align = 'lef
           {Object.entries(groupedModels).map(([provider, models]) => (
             <div key={provider}>
               <div className="px-2.5 py-1.5 text-[10px] font-semibold text-zinc-500 tracking-wider uppercase flex items-center gap-1.5">
-                <span className={`w-1.5 h-1.5 rounded-full ${getProviderColor(provider)}`} />
+                <ProviderIcon provider={provider} className={`w-3.5 h-3.5 ${getProviderTextColor(provider)}`} />
                 {getProviderLabel(provider)}
               </div>
               {models.map((model) => {
@@ -102,11 +127,13 @@ export default function ModelSelect({ selectedModel, onModelChange, align = 'lef
                   >
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-1.5">
-                        <span className={`w-1.5 h-1.5 rounded-full ${getProviderColor(model.provider)}`} />
-                        <span className="font-semibold text-xs truncate">{model.name}</span>
-                        <span className="text-[9px] bg-white/[0.05] px-1.5 py-0.5 rounded text-zinc-500 font-medium">
-                          {getProviderLabel(model.provider)}
+                        <span 
+                          className={`inline-flex items-center justify-center p-0.5 rounded border shrink-0 ${getProviderBadgeStyle(model.provider)}`}
+                          title={getProviderLabel(model.provider)}
+                        >
+                          <ProviderIcon provider={model.provider} className="w-2.5 h-2.5" />
                         </span>
+                        <span className="font-semibold text-xs truncate">{model.name}</span>
                       </div>
                       <div className="text-[10px] text-zinc-500 mt-1 line-clamp-2 leading-relaxed">
                         {model.description}
