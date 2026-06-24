@@ -27,7 +27,7 @@ const getRelativeTime = (date: string) => {
   return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 };
 
-export default function ChatSidebar({ collapsed = false, onToggle = () => {} }: { collapsed?: boolean, onToggle?: () => void }) {
+export default function ChatSidebar({ collapsed = false, onToggle = () => {}, isMobile = false, onClose = () => {} }: { collapsed?: boolean, onToggle?: () => void, isMobile?: boolean, onClose?: () => void }) {
   const { data: session } = useSession();
   const router = useRouter();
   const [threads, setThreads] = useState<Thread[]>([]);
@@ -72,14 +72,23 @@ export default function ChatSidebar({ collapsed = false, onToggle = () => {} }: 
     setSelectedThreadId(threadId);
     localStorage.setItem('selectedThreadId', threadId);
     window.dispatchEvent(new CustomEvent("threadSelected", { detail: { threadId } }));
+    // Auto-close sidebar on mobile after selecting a thread
+    if (isMobile) {
+      onClose();
+    }
   };
 
+  // On mobile: fixed overlay with slide animation. On desktop: flex column in layout.
+  const sidebarClasses = isMobile
+    ? `fixed inset-y-0 left-0 w-[280px] z-50 transform transition-transform duration-300 ease-in-out ${collapsed ? '-translate-x-full' : 'translate-x-0'} bg-surface-1/95 backdrop-blur-xl border-r border-white/[0.06] select-none`
+    : `flex flex-col h-full ${collapsed ? 'w-16' : 'w-[280px]'} bg-surface-1/80 backdrop-blur-xl border-r border-white/[0.06] transition-all duration-300 ease-in-out z-30 select-none relative`;
+
   return (
-    <aside className={`flex flex-col h-full ${collapsed ? 'w-16' : 'w-[280px]'} bg-surface-1/80 backdrop-blur-xl border-r border-white/[0.06] transition-all duration-300 ease-in-out z-30 select-none relative`}>
+    <aside className={`flex flex-col h-full ${sidebarClasses}`}>
       {/* Brand Header */}
-      <div className={`flex items-center p-4 border-b border-white/[0.06] h-16 ${collapsed ? 'justify-center' : 'justify-between'}`}>
-        {!collapsed && (
-          <div className="flex items-center gap-2 cursor-pointer" onClick={() => router.push('/')}>
+      <div className={`flex items-center p-4 border-b border-white/[0.06] h-16 ${!isMobile && collapsed ? 'justify-center' : 'justify-between'}`}>
+        {(isMobile || !collapsed) && (
+          <div className="flex items-center gap-2 cursor-pointer" onClick={() => { router.push('/'); if (isMobile) onClose(); }}>
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent-primary/15 text-accent-primary font-black text-sm">
               T3
             </div>
@@ -87,10 +96,14 @@ export default function ChatSidebar({ collapsed = false, onToggle = () => {} }: 
         )}
         <button
           className="p-1.5 rounded-lg text-zinc-500 hover:text-zinc-200 hover:bg-white/[0.04] transition-all duration-200"
-          onClick={onToggle}
-          aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          onClick={isMobile ? onClose : onToggle}
+          aria-label={isMobile ? 'Close sidebar' : (collapsed ? 'Expand sidebar' : 'Collapse sidebar')}
         >
-          {collapsed ? (
+          {isMobile ? (
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          ) : collapsed ? (
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">
               <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 4.5l7.5 7.5-7.5 7.5m-6-15l7.5 7.5-7.5 7.5" />
             </svg>
@@ -104,11 +117,11 @@ export default function ChatSidebar({ collapsed = false, onToggle = () => {} }: 
 
       {/* New Chat Actions Area */}
       <div className="p-3">
-        <NewThreadButton collapsed={collapsed} />
+        <NewThreadButton collapsed={isMobile ? false : collapsed} />
       </div>
 
-      {/* Collapsed view items */}
-      {collapsed ? (
+      {/* Collapsed view items (desktop only) */}
+      {!isMobile && collapsed ? (
         <div className="flex-1 flex flex-col items-center justify-between py-4 border-t border-white/[0.06]">
           <div className="flex flex-col gap-2 items-center">
             {/* Quick access icon: simple list tooltip indicator */}
@@ -121,7 +134,7 @@ export default function ChatSidebar({ collapsed = false, onToggle = () => {} }: 
           {/* Collapsed Profile Avatar */}
           <div 
             className="w-10 h-10 rounded-full cursor-pointer overflow-hidden border border-white/[0.08] hover:border-accent-primary/50 transition-all duration-300"
-            onClick={() => router.push('/settings')}
+            onClick={() => { router.push('/settings'); if (isMobile) onClose(); }}
             title="Settings"
           >
             {session?.user?.image ? (
@@ -201,7 +214,7 @@ export default function ChatSidebar({ collapsed = false, onToggle = () => {} }: 
           <div className="px-3 py-3 border-t border-white/[0.06]">
             <div 
               className="flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-white/[0.04] transition-all duration-200 group cursor-pointer"
-              onClick={() => router.push('/settings')}
+              onClick={() => { router.push('/settings'); if (isMobile) onClose(); }}
             >
               <div className="relative shrink-0">
                 {session?.user?.image ? (

@@ -45,9 +45,9 @@ export default function ChatInput({ onSendMessage, isLoading }: ChatInputProps) 
   };
 
   return (
-    <div className="px-4 pb-5 pt-3 bg-gradient-to-t from-surface-0 via-surface-0/80 to-transparent">
+    <div className="px-3 sm:px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:pb-5 pt-2 sm:pt-3 bg-gradient-to-t from-surface-0 via-surface-0/80 to-transparent">
       <form onSubmit={handleSubmit} className="max-w-3xl mx-auto relative">
-        <div className="bg-surface-2/50 border border-white/[0.08] rounded-2xl p-2 pr-2.5 pl-4 flex items-end gap-2 focus-within:border-accent-primary/30 focus-within:ring-1 focus-within:ring-accent-primary/15 transition-all duration-300 shadow-lg shadow-black/20">
+        <div className="bg-surface-2/50 border border-white/[0.08] rounded-2xl p-1.5 sm:p-2 pr-2 sm:pr-2.5 pl-3 sm:pl-4 flex items-end gap-1.5 sm:gap-2 focus-within:border-accent-primary/30 focus-within:ring-1 focus-within:ring-accent-primary/15 transition-all duration-300 shadow-lg shadow-black/20">
           <textarea
             ref={textareaRef}
             value={message}
@@ -80,7 +80,7 @@ export default function ChatInput({ onSendMessage, isLoading }: ChatInputProps) 
             )}
           </button>
         </div>
-        <div className="text-[10px] text-zinc-700 text-center mt-2">
+        <div className="text-[9px] sm:text-[10px] text-zinc-700 text-center mt-1.5 sm:mt-2">
           T3.chat can make mistakes. Please check important info.
         </div>
       </form>

@@ -277,7 +277,7 @@ export default function ChatWindow({ onSidebarToggle }: { onSidebarToggle: () =>
   return (
     <section className="flex flex-col flex-1 h-full bg-transparent relative overflow-hidden">
       {/* Header */}
-      <header className="px-4 py-3 border-b border-white/[0.04] bg-surface-1/60 backdrop-blur-xl flex items-center justify-between z-10">
+      <header className="px-3 sm:px-4 py-2 sm:py-3 border-b border-white/[0.04] bg-surface-1/60 backdrop-blur-xl flex items-center justify-between z-10">
         <div className="flex items-center gap-3">
           {/* Hamburger Menu to Toggle Sidebar */}
           <button
@@ -292,7 +292,7 @@ export default function ChatWindow({ onSidebarToggle }: { onSidebarToggle: () =>
           
           {/* Active Thread Title */}
           {currentThreadTitle && (
-            <span className="text-sm font-medium text-zinc-300 truncate max-w-[200px] sm:max-w-[300px]">
+            <span className="text-xs sm:text-sm font-medium text-zinc-300 truncate max-w-[140px] sm:max-w-[300px]">
               {currentThreadTitle}
             </span>
           )}
@@ -303,19 +303,19 @@ export default function ChatWindow({ onSidebarToggle }: { onSidebarToggle: () =>
       </header>
 
       {/* Chat Messages and Landing Dashboard */}
-      <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6">
+      <div className="flex-1 overflow-y-auto px-3 sm:px-4 py-4 sm:py-6 space-y-4 sm:space-y-6">
         {messages.length === 0 && pendingNewThread ? (
           /* Modern Landing Dashboard */
-          <div className="max-w-2xl mx-auto flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
+          <div className="max-w-2xl mx-auto flex flex-col items-center justify-center min-h-[60vh] text-center px-2 sm:px-4">
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-accent-primary/10 mb-6 animate-float">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-7 h-7 text-accent-primary">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z" />
               </svg>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight gradient-text mb-2">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight gradient-text mb-2">
               Hi {firstName}, how can I help you today?
             </h2>
-            <p className="text-zinc-500 text-sm max-w-md mb-10 leading-relaxed">
+            <p className="text-zinc-500 text-xs sm:text-sm max-w-md mb-6 sm:mb-10 leading-relaxed">
               Choose a model above and prompt below to start a conversation, or select one of the ideas below.
             </p>
 
@@ -339,17 +339,17 @@ export default function ChatWindow({ onSidebarToggle }: { onSidebarToggle: () =>
           </div>
         ) : (
           /* Chat List */
-          <div className="max-w-3xl mx-auto space-y-6 pb-4">
+          <div className="max-w-3xl mx-auto space-y-4 sm:space-y-6 pb-4">
             {messages.map((msg) => {
               const isAi = msg.isAi;
               return (
                 <div
                   key={msg.id}
-                  className={`flex gap-3 items-start animate-fade-in ${isAi ? 'justify-start' : 'justify-end'}`}
+                  className={`flex gap-2 sm:gap-3 items-start animate-fade-in ${isAi ? 'justify-start' : 'justify-end'}`}
                 >
                   {/* AI Avatar */}
                   {isAi && (
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-accent-primary/10 text-accent-primary shadow-inner mt-1">
+                    <div className="flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-xl bg-accent-primary/10 text-accent-primary shadow-inner mt-1">
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
                       </svg>
@@ -358,7 +358,7 @@ export default function ChatWindow({ onSidebarToggle }: { onSidebarToggle: () =>
 
                   {/* Message Bubble */}
                   <div
-                    className={`rounded-2xl max-w-[85%] sm:max-w-[75%] px-4 py-2.5 text-sm leading-relaxed
+                    className={`rounded-2xl max-w-[90%] sm:max-w-[75%] px-3 sm:px-4 py-2 sm:py-2.5 text-[13px] sm:text-sm leading-relaxed
                       ${isAi
                         ? 'bg-white/[0.03] border border-white/[0.05] rounded-tl-sm text-foreground'
                         : 'bg-gradient-to-br from-accent-primary to-accent-primary-dark text-white rounded-tr-sm ml-auto'}
@@ -407,8 +407,8 @@ export default function ChatWindow({ onSidebarToggle }: { onSidebarToggle: () =>
 
             {/* Typing indicator spinner dot card */}
             {isLoading && messages.length > 0 && !messages[messages.length - 1].isAi && (
-              <div className="flex gap-3 items-start justify-start animate-fade-in">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-accent-primary/10 text-accent-primary shadow-inner mt-1">
+              <div className="flex gap-2 sm:gap-3 items-start justify-start animate-fade-in">
+                <div className="flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-xl bg-accent-primary/10 text-accent-primary shadow-inner mt-1">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
                   </svg>

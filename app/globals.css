@@ -33,8 +33,8 @@
 }
 
 html, body {
-  height: 100%;
-  min-height: 100vh;
+  height: 100dvh;
+  min-height: 100dvh;
   background: rgb(var(--background-rgb));
   color: rgb(var(--foreground-rgb));
   box-sizing: border-box;
@@ -54,7 +54,7 @@ body {
 }
 
 body, #__next, #root {
-  min-height: 100vh;
+  min-height: 100dvh;
   color: rgb(var(--foreground-rgb));
 }
 
@@ -280,4 +280,27 @@ body, #__next, #root {
 .focus-ring {
   outline: none;
   box-shadow: 0 0 0 2px rgba(var(--accent-primary-rgb), 0.3);
+}
+
+/* ─── Safe Area Support ─── */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* ─── Mobile Optimizations ─── */
+@media (max-width: 640px) {
+  .prose, .markdown {
+    font-size: 0.85rem;
+    line-height: 1.65;
+  }
+  .prose pre, .markdown pre {
+    border-radius: 8px;
+    margin: 0.75rem -0.25rem;
+    padding: 0.75rem;
+  }
+  .prose code, .markdown code {
+    font-size: 0.8em;
+  }
 }

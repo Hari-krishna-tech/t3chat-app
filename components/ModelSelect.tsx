@@ -57,10 +57,10 @@ export default function ModelSelect({ selectedModel, onModelChange, align = 'lef
       {/* Pill selector button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 bg-white/[0.08] border border-white/[0.12] text-zinc-300 hover:text-zinc-100 hover:bg-white/[0.12] rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-200 active:scale-95 cursor-pointer"
+        className="flex items-center gap-1.5 sm:gap-2 bg-white/[0.08] border border-white/[0.12] text-zinc-300 hover:text-zinc-100 hover:bg-white/[0.12] rounded-full px-2.5 sm:px-3 py-1.5 text-[11px] sm:text-xs font-medium transition-all duration-200 active:scale-95 cursor-pointer"
       >
         <span className={`w-2 h-2 rounded-full ${selectedModelConfig ? getProviderColor(selectedModelConfig.provider) : 'bg-zinc-500'} shadow-sm`} />
-        <span className="truncate max-w-[120px] sm:max-w-none">{selectedModelConfig?.name}</span>
+        <span className="truncate max-w-[80px] sm:max-w-[120px] md:max-w-none">{selectedModelConfig?.name}</span>
         <svg
           className={`w-3.5 h-3.5 text-zinc-600 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
           fill="none"
@@ -75,8 +75,8 @@ export default function ModelSelect({ selectedModel, onModelChange, align = 'lef
       {/* Dropdown List */}
       {isOpen && (
         <div 
-          className={`absolute mt-2 w-72 max-h-[350px] overflow-y-auto bg-surface-2/95 backdrop-blur-xl border border-white/[0.08] rounded-xl shadow-2xl shadow-black/40 p-1 z-50 animate-scale-in
-            ${align === 'right' ? 'right-0' : 'left-0'}
+          className={`fixed sm:absolute left-2 right-2 sm:left-auto sm:right-auto mt-2 sm:w-72 max-h-[60vh] sm:max-h-[350px] overflow-y-auto bg-surface-2/95 backdrop-blur-xl border border-white/[0.08] rounded-xl shadow-2xl shadow-black/40 p-1 z-50 animate-scale-in
+            ${align === 'right' ? 'sm:right-0' : 'sm:left-0'}
           `}
         >
           {Object.entries(groupedModels).map(([provider, models]) => (

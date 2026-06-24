@@ -48,11 +48,11 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="h-screen bg-transparent text-foreground overflow-y-auto px-4 py-8 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto space-y-8 pb-12 animate-fade-in">
+    <div className="h-[100dvh] bg-transparent text-foreground overflow-y-auto px-3 py-4 sm:px-6 sm:py-8 lg:px-8">
+      <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8 pb-[calc(3rem+env(safe-area-inset-bottom))] animate-fade-in">
         
         {/* Header navigation bar */}
-        <div className="flex items-center justify-between pb-6 border-b border-white/[0.04]">
+        <div className="flex items-center justify-between pb-4 sm:pb-6 border-b border-white/[0.04]">
           <div className="flex items-center gap-4">
             <button
               onClick={() => router.push("/")}
@@ -64,14 +64,14 @@ export default function SettingsPage() {
               </svg>
             </button>
             <div>
-              <h1 className="text-xl font-bold tracking-tight text-zinc-100">Settings</h1>
-              <p className="text-xs text-zinc-500">Manage your workspace configuration and preferences</p>
+              <h1 className="text-lg sm:text-xl font-bold tracking-tight text-zinc-100">Settings</h1>
+              <p className="text-[10px] sm:text-xs text-zinc-500">Manage your workspace configuration and preferences</p>
             </div>
           </div>
 
           <button
             onClick={() => signOut()}
-            className="bg-red-500/[0.08] border border-red-500/15 text-red-400 hover:bg-red-500/[0.15] hover:border-red-500/25 rounded-lg px-4 py-2 text-xs font-medium transition-all active:scale-95 cursor-pointer"
+            className="bg-red-500/[0.08] border border-red-500/15 text-red-400 hover:bg-red-500/[0.15] hover:border-red-500/25 rounded-lg px-3 py-1.5 sm:px-4 sm:py-2 text-[11px] sm:text-xs font-medium transition-all active:scale-95 cursor-pointer shrink-0"
           >
             Sign Out
           </button>
@@ -81,7 +81,7 @@ export default function SettingsPage() {
         <div className="grid grid-cols-1 gap-6">
           
           {/* User Profile Section */}
-          <section className="bg-surface-1/60 backdrop-blur-xl rounded-2xl p-6 border border-white/[0.06] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <section className="bg-surface-1/60 backdrop-blur-xl rounded-2xl p-4 sm:p-6 border border-white/[0.06] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-4">
               <div className="relative shrink-0">
                 {session?.user?.image ? (
@@ -107,7 +107,7 @@ export default function SettingsPage() {
             </div>
 
             {/* Total Limits widget */}
-            <div className="bg-white/[0.03] border border-white/[0.05] rounded-xl px-5 py-4 min-w-[150px] flex flex-col justify-center">
+            <div className="bg-white/[0.03] border border-white/[0.05] rounded-xl px-4 sm:px-5 py-3 sm:py-4 w-full sm:w-auto sm:min-w-[150px] flex flex-col justify-center">
               <div className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Total API Limits</div>
               <div className="text-xl font-black text-accent-primary mt-1">1,500 <span className="text-xs font-normal text-zinc-400">/mo</span></div>
               <div className="w-full bg-white/[0.06] h-1.5 rounded-full overflow-hidden mt-2.5">
@@ -117,20 +117,20 @@ export default function SettingsPage() {
           </section>
 
           {/* Theme Settings Section */}
-          <section className="bg-surface-1/60 backdrop-blur-xl rounded-2xl p-6 border border-white/[0.06]">
+          <section className="bg-surface-1/60 backdrop-blur-xl rounded-2xl p-4 sm:p-6 border border-white/[0.06]">
             <div className="mb-4">
               <h2 className="text-base font-semibold text-zinc-100">Theme Settings</h2>
               <p className="text-xs text-zinc-500 mt-1">Customize your editor interface color palette</p>
             </div>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3">
               {themes.map((theme) => {
                 const isActive = currentTheme.name === theme.name;
                 return (
                   <button
                     key={theme.name}
                     onClick={() => setTheme(theme)}
-                    className={`group text-left p-4 rounded-xl border transition-all duration-300 relative flex flex-col cursor-pointer active:scale-[0.98] select-none
+                    className={`group text-left p-3 sm:p-4 rounded-xl border transition-all duration-300 relative flex flex-col cursor-pointer active:scale-[0.98] select-none
                       ${isActive
                         ? "border-accent-primary/40 bg-accent-primary/[0.05] shadow-sm shadow-accent-primary/10"
                         : "border border-white/[0.06] bg-white/[0.02] hover:border-white/[0.12] hover:bg-white/[0.03]"
@@ -188,7 +188,7 @@ export default function SettingsPage() {
           </section>
 
           {/* Model Availability Section */}
-          <section className="bg-surface-1/60 backdrop-blur-xl rounded-2xl p-6 border border-white/[0.06]">
+          <section className="bg-surface-1/60 backdrop-blur-xl rounded-2xl p-4 sm:p-6 border border-white/[0.06]">
             <div className="mb-4">
               <h2 className="text-base font-semibold text-zinc-100">Available Models</h2>
               <p className="text-xs text-zinc-500 mt-1">Explore AI models supported by your API workspace key</p>
@@ -198,7 +198,7 @@ export default function SettingsPage() {
               {MODELS.map((model) => (
                 <li 
                   key={model.id} 
-                  className="bg-white/[0.02] border border-white/[0.05] rounded-xl p-4 flex flex-col justify-between gap-3 hover:border-white/[0.08] transition-all duration-200"
+                  className="bg-white/[0.02] border border-white/[0.05] rounded-xl p-3 sm:p-4 flex flex-col justify-between gap-2 sm:gap-3 hover:border-white/[0.08] transition-all duration-200"
                 >
                   <div className="min-w-0">
                     <div className="flex items-center flex-wrap gap-2">
