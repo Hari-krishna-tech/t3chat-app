@@ -50,6 +50,12 @@ model User {
   threads       Thread[]  // Threads created by the user
   messages      Message[] // Messages sent by the user
   chats         Chat[]    // Chats the user is part of
+
+  // Custom AI behavior profile fields
+  preferredName String?
+  occupation    String?
+  traits        String?
+  aboutUser     String?   @db.Text
 }
 
 model VerificationToken {

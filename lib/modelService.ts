@@ -12,7 +12,19 @@ type MessageType = {
   };
 };
 
-export async function* streamModelResponse(model: ModelType, messages: string | MessageType[], isTitle: boolean) {
+type UserProfileType = {
+  preferredName?: string | null;
+  occupation?: string | null;
+  traits?: string | null;
+  aboutUser?: string | null;
+};
+
+export async function* streamModelResponse(
+  model: ModelType, 
+  messages: string | MessageType[], 
+  isTitle: boolean,
+  userProfile?: UserProfileType
+) {
   let openrouterMessages: { role: string; content: string }[] = [];
 
   if (isTitle) {
@@ -30,8 +42,40 @@ export async function* streamModelResponse(model: ModelType, messages: string | 
         }))
       : [{ role: "user", content: messages }];
 
+    // Construct the system prompt based on user's customize preferences
+    let systemPrompt = "You are a helpful assistant. Answer in markdown format.";
+
+    const hasProfileInfo = userProfile && (
+      (userProfile.preferredName && userProfile.preferredName.trim() !== "") ||
+      (userProfile.occupation && userProfile.occupation.trim() !== "") ||
+      (userProfile.traits && userProfile.traits.trim() !== "") ||
+      (userProfile.aboutUser && userProfile.aboutUser.trim() !== "")
+    );
+
+    if (hasProfileInfo) {
+      const { preferredName, occupation, traits, aboutUser } = userProfile!;
+      let instructions = "";
+      
+      if (preferredName && preferredName.trim() !== "") {
+        instructions += `\n- The user's name is: ${preferredName.trim()}. Please call the user by their name when appropriate.`;
+      }
+      if (occupation && occupation.trim() !== "") {
+        instructions += `\n- The user does the following: ${occupation.trim()}. Feel free to tailor answers to match their occupation.`;
+      }
+      if (traits && traits.trim() !== "") {
+        instructions += `\n- You should behave with the following personality traits: ${traits.trim()}. Adapt your tone, phrasing, and response style to match these traits.`;
+      }
+      if (aboutUser && aboutUser.trim() !== "") {
+        instructions += `\n- Here is additional context about the user's interests, values, and preferences:\n${aboutUser.trim()}`;
+      }
+
+      systemPrompt += `\n\nTake the following user profile and persona guidelines into consideration for all responses:${instructions}`;
+    } else {
+      systemPrompt += " Be concise and to the point.";
+    }
+
     openrouterMessages = [
-      { role: "system", content: "You are a helpful assistant. Answer in markdown format. Be concise and to the point." },
+      { role: "system", content: systemPrompt },
       ...formattedMessages
     ];
   }
