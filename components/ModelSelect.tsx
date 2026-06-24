@@ -57,7 +57,7 @@ export default function ModelSelect({ selectedModel, onModelChange, align = 'lef
       {/* Pill selector button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 bg-white/[0.04] border border-white/[0.07] text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.07] rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-200 active:scale-95 cursor-pointer"
+        className="flex items-center gap-2 bg-white/[0.08] border border-white/[0.12] text-zinc-300 hover:text-zinc-100 hover:bg-white/[0.12] rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-200 active:scale-95 cursor-pointer"
       >
         <span className={`w-2 h-2 rounded-full ${selectedModelConfig ? getProviderColor(selectedModelConfig.provider) : 'bg-zinc-500'} shadow-sm`} />
         <span className="truncate max-w-[120px] sm:max-w-none">{selectedModelConfig?.name}</span>

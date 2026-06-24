@@ -23,7 +23,16 @@ export default function ChatWindow({ onSidebarToggle }: { onSidebarToggle: () =>
   const { data: session } = useSession();
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedModel, setSelectedModel] = useState<ModelType>("qwen/qwen3-8b");
+  const [selectedModel, setSelectedModel] = useState<ModelType>(() => {
+    if (typeof window !== 'undefined') {
+      return (localStorage.getItem('selectedModel') as ModelType) || "qwen/qwen3-8b";
+    }
+    return "qwen/qwen3-8b";
+  });
+
+  useEffect(() => {
+    localStorage.setItem('selectedModel', selectedModel);
+  }, [selectedModel]);
   const [currentThreadTitle, setCurrentThreadTitle] = useState<string | null>(null);
 
   const [currentThreadId, setCurrentThreadId] = useState<string | null>(() => {

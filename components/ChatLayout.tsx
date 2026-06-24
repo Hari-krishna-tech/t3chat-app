@@ -5,7 +5,12 @@ import ChatSidebar from "./ChatSidebar";
 import ChatWindow from "./ChatWindow";
 
 export default function ChatLayout() {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth < 768;
+    }
+    return true;
+  });
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-background text-foreground relative">
