@@ -105,17 +105,15 @@ export default function ChatWindow({
     }
   };
 
-  const createThreadAndSendMessage = async (message: string, model: ModelType) => {
+  const generateThreadTitle = async (message: string, model: ModelType, threadId: string) => {
     try {
-      setIsLoading(true);
-      // 1. Generate a title using the LLM
       const titlePrompt = `Suggest a short, relevant chat title for this message: "${message}". Respond with only the title, no punctuation or quotes.`;
       const titleRes = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messages: titlePrompt, model, isTitle: true }),
       });
-      let title = 'New Chat';
+      let aiTitle = 'New Chat';
       if (titleRes.ok && titleRes.body) {
         const reader = titleRes.body.getReader();
         let titleText = '';
@@ -124,39 +122,73 @@ export default function ChatWindow({
           if (done) break;
           titleText += new TextDecoder().decode(value);
         }
-        title = titleText.trim().replace(/^"|"$/g, '');
-        if (!title) title = 'New Chat';
+        aiTitle = titleText.trim().replace(/^"|"$/g, '');
+        if (!aiTitle) aiTitle = 'New Chat';
       }
-      // 2. Create the thread with the generated title
+      const res = await fetch(`/api/threads/${threadId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: aiTitle }),
+      });
+      if (res.ok) {
+        setCurrentThreadTitle(aiTitle);
+        window.dispatchEvent(new CustomEvent('threadTitleUpdated', {
+          detail: { threadId, title: aiTitle },
+        }));
+      }
+    } catch (err) {
+      console.error('Error generating thread title:', err);
+    }
+  };
+
+  const createThreadAndSendMessage = async (message: string, model: ModelType) => {
+    const optimisticId = 'temp-msg-' + Date.now();
+    const optimisticMessage: Message = {
+      id: optimisticId,
+      content: message,
+      createdAt: new Date(),
+      userId: session?.user?.email || 'user',
+      isAi: false,
+      user: {
+        name: session?.user?.name || null,
+        image: session?.user?.image || null,
+      },
+    };
+    setMessages((prev) => [...prev, optimisticMessage]);
+    try {
+      setIsLoading(true);
+      const placeholderTitle = message.length > 50 ? message.slice(0, 50) + '...' : message;
+      setCurrentThreadTitle(placeholderTitle);
       const threadRes = await fetch('/api/threads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          title,
+          title: placeholderTitle,
           message,
         }),
       });
       if (!threadRes.ok) throw new Error('Failed to create thread');
       const thread = await threadRes.json();
       setCurrentThreadId(thread.id);
-      setCurrentThreadTitle(title);
       setPendingNewThread(false);
-      setMessages(thread.messages);
-      // Emit event for new thread creation
-      window.dispatchEvent(new CustomEvent('newThreadCreated', { 
-        detail: { 
+      setMessages((prev) =>
+        prev.map((m) => (m.id === optimisticId ? thread.messages[0] : m))
+      );
+      window.dispatchEvent(new CustomEvent('newThreadCreated', {
+        detail: {
           thread: {
             id: thread.id,
-            title: title,
+            title: placeholderTitle,
             createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-          }
-        } 
+            updatedAt: new Date().toISOString(),
+          },
+        },
       }));
-      // Now, get AI response as normal
+      generateThreadTitle(message, model, thread.id);
       await getAIResponse(message, model, thread.id);
     } catch (err) {
       console.error('Error creating thread and sending message:', err);
+      setMessages((prev) => prev.filter((m) => m.id !== optimisticId));
     } finally {
       setIsLoading(false);
     }

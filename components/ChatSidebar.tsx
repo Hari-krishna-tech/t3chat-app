@@ -62,9 +62,17 @@ export default function ChatSidebar({ collapsed = false, onToggle = () => {}, is
       localStorage.setItem('selectedThreadId', event.detail.thread.id);
     };
 
+    const handleThreadTitleUpdated = (event: CustomEvent<{ threadId: string; title: string }>) => {
+      setThreads(prev =>
+        prev.map(t => t.id === event.detail.threadId ? { ...t, title: event.detail.title } : t)
+      );
+    };
+
     window.addEventListener('newThreadCreated', handleNewThreadCreated as EventListener);
+    window.addEventListener('threadTitleUpdated', handleThreadTitleUpdated as EventListener);
     return () => {
       window.removeEventListener('newThreadCreated', handleNewThreadCreated as EventListener);
+      window.removeEventListener('threadTitleUpdated', handleThreadTitleUpdated as EventListener);
     };
   }, []);
 

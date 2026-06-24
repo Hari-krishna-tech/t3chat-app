@@ -3,6 +3,35 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
+export async function PATCH(
+  req: Request,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.email) {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
+
+    const body = await req.json();
+    const { title } = body;
+
+    if (!title) {
+      return new NextResponse("Missing title", { status: 400 });
+    }
+
+    const thread = await prisma.thread.update({
+      where: { id: params.id },
+      data: { title },
+    });
+
+    return NextResponse.json(thread);
+  } catch (error) {
+    console.error("[THREAD_PATCH]", error);
+    return new NextResponse("Internal Error", { status: 500 });
+  }
+}
+
 export async function GET(
   req: Request,
   { params }: { params: { id: string } }
