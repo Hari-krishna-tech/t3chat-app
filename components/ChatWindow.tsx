@@ -19,7 +19,15 @@ type Message = {
   };
 };
 
-export default function ChatWindow({ onSidebarToggle }: { onSidebarToggle: () => void }) {
+export default function ChatWindow({
+  onSidebarToggle,
+  sidebarCollapsed = true,
+  isMobile = false,
+}: {
+  onSidebarToggle: () => void;
+  sidebarCollapsed?: boolean;
+  isMobile?: boolean;
+}) {
   const { data: session } = useSession();
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -280,15 +288,17 @@ export default function ChatWindow({ onSidebarToggle }: { onSidebarToggle: () =>
       <header className="px-3 sm:px-4 py-2 sm:py-3 border-b border-white/[0.04] bg-surface-1/60 backdrop-blur-xl flex items-center justify-between z-10">
         <div className="flex items-center gap-3">
           {/* Hamburger Menu to Toggle Sidebar */}
-          <button
-            onClick={onSidebarToggle}
-            className="text-zinc-500 hover:text-zinc-200 hover:bg-white/[0.05] rounded-lg p-2 transition-all cursor-pointer active:scale-95"
-            title="Toggle Sidebar"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4.5 h-4.5">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12" />
-            </svg>
-          </button>
+          {(isMobile || sidebarCollapsed) && (
+            <button
+              onClick={onSidebarToggle}
+              className="text-zinc-500 hover:text-zinc-200 hover:bg-white/[0.05] rounded-lg p-2 transition-all cursor-pointer active:scale-95 shrink-0"
+              title="Toggle Sidebar"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12" />
+              </svg>
+            </button>
+          )}
           
           {/* Active Thread Title */}
           {currentThreadTitle && (

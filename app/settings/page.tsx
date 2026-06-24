@@ -95,7 +95,7 @@ export default function SettingsPage() {
                     {session?.user?.name?.[0] || "U"}
                   </div>
                 )}
-                <div className="absolute -bottom-1 -right-1 w-4.5 h-4.5 bg-green-500 border-2 border-background-dark rounded-full" />
+                <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-green-500 border-2 border-background-dark rounded-full" />
               </div>
               <div className="min-w-0">
                 <div className="text-lg font-semibold text-zinc-100 truncate">{session?.user?.name || "User Workspace"}</div>

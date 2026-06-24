@@ -54,7 +54,11 @@ export default function ChatLayout() {
         onClose={closeSidebar}
       />
       <main className="flex-1 h-full min-w-0 relative flex flex-col">
-        <ChatWindow onSidebarToggle={openSidebar} />
+        <ChatWindow 
+          onSidebarToggle={openSidebar} 
+          sidebarCollapsed={collapsed}
+          isMobile={isMobile}
+        />
       </main>
     </div>
   );

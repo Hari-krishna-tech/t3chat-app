@@ -12,17 +12,17 @@ module.exports = {
       },
       colors: {
         background: {
-          DEFAULT: 'rgb(var(--background-rgb))',
-          dark: 'rgb(var(--background-dark-rgb))',
+          DEFAULT: 'rgba(var(--background-rgb), <alpha-value>)',
+          dark: 'rgba(var(--background-dark-rgb), <alpha-value>)',
         },
         foreground: {
-          DEFAULT: 'rgb(var(--foreground-rgb))',
+          DEFAULT: 'rgba(var(--foreground-rgb), <alpha-value>)',
         },
         surface: {
-          0: 'rgb(var(--surface-0))',
-          1: 'rgb(var(--surface-1))',
-          2: 'rgb(var(--surface-2))',
-          3: 'rgb(var(--surface-3))',
+          0: 'rgba(var(--surface-0), <alpha-value>)',
+          1: 'rgba(var(--surface-1), <alpha-value>)',
+          2: 'rgba(var(--surface-2), <alpha-value>)',
+          3: 'rgba(var(--surface-3), <alpha-value>)',
         },
         border: {
           DEFAULT: 'rgba(var(--border-rgb), 0.08)',
@@ -30,14 +30,14 @@ module.exports = {
           strong: 'rgba(var(--border-rgb), 0.12)',
         },
         accent: {
-          primary: 'rgb(var(--accent-primary-rgb))',
-          'primary-dark': 'rgb(var(--accent-primary-dark-rgb))',
-          secondary: 'rgb(var(--accent-secondary-rgb))',
-          'secondary-dark': 'rgb(var(--accent-secondary-dark-rgb))',
-          success: 'rgb(var(--accent-success-rgb))',
-          warning: 'rgb(var(--accent-warning-rgb))',
-          error: 'rgb(var(--accent-error-rgb))',
-          info: 'rgb(var(--accent-info-rgb))',
+          primary: 'rgba(var(--accent-primary-rgb), <alpha-value>)',
+          'primary-dark': 'rgba(var(--accent-primary-dark-rgb), <alpha-value>)',
+          secondary: 'rgba(var(--accent-secondary-rgb), <alpha-value>)',
+          'secondary-dark': 'rgba(var(--accent-secondary-dark-rgb), <alpha-value>)',
+          success: 'rgba(var(--accent-success-rgb), <alpha-value>)',
+          warning: 'rgba(var(--accent-warning-rgb), <alpha-value>)',
+          error: 'rgba(var(--accent-error-rgb), <alpha-value>)',
+          info: 'rgba(var(--accent-info-rgb), <alpha-value>)',
         },
         muted: {
           DEFAULT: 'rgba(var(--foreground-rgb), 0.5)',
