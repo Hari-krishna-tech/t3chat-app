@@ -100,7 +100,7 @@ export default function ModelSelect({ selectedModel, onModelChange, align = 'lef
       {/* Dropdown List */}
       {isOpen && (
         <div 
-          className={`absolute mt-2 w-[calc(100vw-24px)] max-w-72 max-h-[60vh] sm:max-h-[350px] overflow-y-auto bg-surface-2/95 backdrop-blur-xl border border-white/[0.08] rounded-xl shadow-2xl shadow-black/40 p-1 z-50 animate-scale-in
+          className={`absolute mt-2 w-[calc(100vw-24px)] sm:w-80 max-h-[60vh] sm:max-h-[350px] overflow-y-auto bg-surface-2/95 backdrop-blur-xl border border-white/[0.08] rounded-xl shadow-2xl shadow-black/40 p-1 z-50 animate-scale-in
             ${align === 'right' ? 'right-0' : 'left-0'}
           `}
         >
